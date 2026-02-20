@@ -47,21 +47,31 @@ async function fetchSchoolByName(apiKey: string, name: string): Promise<Scorecar
   params.set("_per_page", "8");
   params.set("fields", fields);
 
-  const res = await fetch(`${endpoint}?${params.toString()}`);
-  if (!res.ok) {
-    throw new Error(`Scorecard API request failed (${res.status} ${res.statusText}) for ${name}`);
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const res = await fetch(`${endpoint}?${params.toString()}`);
+
+    if (!res.ok) {
+      // Retry transient server errors/rate limits, then gracefully skip.
+      if ((res.status >= 500 || res.status === 429) && attempt < 3) {
+        await new Promise((resolve) => setTimeout(resolve, attempt * 500));
+        continue;
+      }
+      return null;
+    }
+
+    const payload = (await res.json()) as { results?: ScorecardSchool[] };
+    const results = payload.results ?? [];
+
+    if (!results.length) return null;
+
+    const scored = results
+      .map((row) => ({ row, score: scoreName(name, row["school.name"]) }))
+      .sort((a, b) => b.score - a.score);
+
+    return scored[0].score >= 40 ? scored[0].row : null;
   }
 
-  const payload = (await res.json()) as { results?: ScorecardSchool[] };
-  const results = payload.results ?? [];
-
-  if (!results.length) return null;
-
-  const scored = results
-    .map((row) => ({ row, score: scoreName(name, row["school.name"]) }))
-    .sort((a, b) => b.score - a.score);
-
-  return scored[0].score >= 40 ? scored[0].row : null;
+  return null;
 }
 
 async function main() {
