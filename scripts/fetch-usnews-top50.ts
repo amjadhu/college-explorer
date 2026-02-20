@@ -42,13 +42,16 @@ type UsNewsSearchResponse = {
 
 async function fetchPage(url: string): Promise<UsNewsSearchResponse> {
   for (let attempt = 1; attempt <= 4; attempt += 1) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12_000);
     try {
       const res = await fetch(url, {
         headers: {
           "user-agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
           accept: "application/json"
-        }
+        },
+        signal: controller.signal
       });
 
       if (!res.ok) {
@@ -66,6 +69,8 @@ async function fetchPage(url: string): Promise<UsNewsSearchResponse> {
         continue;
       }
       throw error;
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
   throw new Error(`US News search API failed after retries for ${url}.`);
