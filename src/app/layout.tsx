@@ -14,7 +14,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "College Compass",
-  description: "Explore the Forbes Top 50 colleges with real data."
+  description: "Explore top colleges with real data."
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

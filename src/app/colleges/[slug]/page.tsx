@@ -31,7 +31,7 @@ export default async function CollegePage({ params }: Props) {
         ← Back to rankings
       </Link>
       <section className="hero">
-        <span className="badge">Forbes Rank #{college.rank}</span>
+        <span className="badge">Rank #{college.rank}</span>
         <h1 style={{ marginBottom: "0.4rem" }}>{college.forbesName}</h1>
         <p>
           {college.city && college.state ? `${college.city}, ${college.state}` : "Location not available"} • {ownershipLabel(college.ownership)}

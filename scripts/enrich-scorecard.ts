@@ -1,4 +1,4 @@
-import { readForbesData, scoreName, writeScorecardData } from "./lib";
+import { readRankingData, scoreName, writeScorecardData } from "./lib";
 
 type ScorecardSchool = {
   id: number;
@@ -76,33 +76,33 @@ async function fetchSchoolByName(apiKey: string, name: string): Promise<Scorecar
 
 async function main() {
   const apiKey = process.env.COLLEGE_SCORECARD_API_KEY;
-  const forbes = await readForbesData();
+  const rankingData = await readRankingData();
 
   if (!apiKey) {
-    console.warn("COLLEGE_SCORECARD_API_KEY is missing. Writing dataset with Forbes rankings only.");
+    console.warn("COLLEGE_SCORECARD_API_KEY is missing. Writing dataset with ranking source only.");
     await writeScorecardData({
-      source: forbes.source,
+      source: rankingData.source,
       fetchedAt: new Date().toISOString(),
-      colleges: forbes.colleges.map((college) => ({ forbes: college, scorecard: null }))
+      colleges: rankingData.colleges.map((college) => ({ rankItem: college, scorecard: null }))
     });
     return;
   }
-  const enriched: Array<{ forbes: (typeof forbes.colleges)[number]; scorecard: ScorecardSchool | null }> = [];
+  const enriched: Array<{ rankItem: (typeof rankingData.colleges)[number]; scorecard: ScorecardSchool | null }> = [];
 
-  for (const item of forbes.colleges) {
+  for (const item of rankingData.colleges) {
     const row = await fetchSchoolByName(apiKey, item.name);
-    enriched.push({ forbes: item, scorecard: row });
+    enriched.push({ rankItem: item, scorecard: row });
     console.log(`Matched #${item.rank} ${item.name}: ${row?.["school.name"] ?? "NOT FOUND"}`);
   }
 
   await writeScorecardData({
-    source: forbes.source,
+    source: rankingData.source,
     fetchedAt: new Date().toISOString(),
     colleges: enriched
   });
 
   const found = enriched.filter((i) => i.scorecard).length;
-  console.log(`Enriched ${found}/${forbes.colleges.length} colleges using College Scorecard.`);
+  console.log(`Enriched ${found}/${rankingData.colleges.length} colleges using College Scorecard.`);
 }
 
 main().catch((error) => {

@@ -52,7 +52,7 @@ export default function CollegeExplorer({ colleges, fetchedAt, rankingSource }: 
           <h1>College Compass</h1>
           <p>
             A better way for students to compare top schools. Explore admissions, outcomes, cost of attendance, and
-            setting context across the Forbes top 50.
+            setting context across the top 50.
           </p>
         </div>
 

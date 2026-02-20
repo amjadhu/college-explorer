@@ -4,10 +4,10 @@ async function main() {
   const enriched = await readScorecardData();
 
   const colleges = enriched.colleges
-    .map(({ forbes, scorecard }) => ({
-      rank: forbes.rank,
-      slug: forbes.slug,
-      forbesName: forbes.name,
+    .map(({ rankItem, scorecard }) => ({
+      rank: rankItem.rank,
+      slug: rankItem.slug,
+      forbesName: rankItem.name,
       scorecardName: (scorecard?.["school.name"] as string | undefined) ?? null,
       city: (scorecard?.["school.city"] as string | undefined) ?? null,
       state: (scorecard?.["school.state"] as string | undefined) ?? null,

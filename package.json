@@ -8,10 +8,12 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "data:rankings": "tsx scripts/fetch-rankings.ts",
     "data:forbes": "tsx scripts/fetch-forbes-top50.ts",
+    "data:usnews": "tsx scripts/fetch-usnews-top50.ts",
     "data:scorecard": "tsx scripts/enrich-scorecard.ts",
     "data:build": "tsx scripts/build-dataset.ts",
-    "data:refresh": "npm run data:forbes && npm run data:scorecard && npm run data:build"
+    "data:refresh": "npm run data:rankings && npm run data:scorecard && npm run data:build"
   },
   "dependencies": {
     "leaflet": "1.9.4",

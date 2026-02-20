@@ -19,7 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       COLLEGE_SCORECARD_API_KEY: ${{ secrets.COLLEGE_SCORECARD_API_KEY }}
+      RANKING_SOURCE: ${{ vars.RANKING_SOURCE }}
       FORBES_RANKING_URL: ${{ vars.FORBES_RANKING_URL }}
+      USNEWS_RANKING_URL: ${{ vars.USNEWS_RANKING_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

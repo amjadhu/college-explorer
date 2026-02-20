@@ -1,26 +1,26 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-export type ForbesRankItem = {
+export type RankItem = {
   rank: number;
   name: string;
   slug: string;
 };
 
-const FORBES_OUTPUT = path.join(process.cwd(), "data", "raw", "forbes-top50.json");
+const RANKING_OUTPUT = path.join(process.cwd(), "data", "raw", "ranking-top50.json");
 const SCORECARD_OUTPUT = path.join(process.cwd(), "data", "raw", "scorecard-enriched.json");
 const FINAL_OUTPUT = path.join(process.cwd(), "data", "top50-colleges.json");
 
-export async function writeForbesData(data: object) {
-  await fs.mkdir(path.dirname(FORBES_OUTPUT), { recursive: true });
-  await fs.writeFile(FORBES_OUTPUT, JSON.stringify(data, null, 2));
+export async function writeRankingData(data: object) {
+  await fs.mkdir(path.dirname(RANKING_OUTPUT), { recursive: true });
+  await fs.writeFile(RANKING_OUTPUT, JSON.stringify(data, null, 2));
 }
 
-export async function readForbesData(): Promise<{
+export async function readRankingData(): Promise<{
   source: { name: string; url: string; fetchedAt: string };
-  colleges: ForbesRankItem[];
+  colleges: RankItem[];
 }> {
-  const raw = await fs.readFile(FORBES_OUTPUT, "utf-8");
+  const raw = await fs.readFile(RANKING_OUTPUT, "utf-8");
   return JSON.parse(raw);
 }
 
@@ -32,7 +32,7 @@ export async function writeScorecardData(data: object) {
 export async function readScorecardData(): Promise<{
   source: { name: string; url: string; fetchedAt: string };
   fetchedAt: string;
-  colleges: Array<{ forbes: ForbesRankItem; scorecard: Record<string, unknown> | null }>;
+  colleges: Array<{ rankItem: RankItem; scorecard: Record<string, unknown> | null }>;
 }> {
   const raw = await fs.readFile(SCORECARD_OUTPUT, "utf-8");
   return JSON.parse(raw);

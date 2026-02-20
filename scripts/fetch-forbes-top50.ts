@@ -1,4 +1,4 @@
-import { slugify, writeForbesData } from "./lib";
+import { slugify, writeRankingData } from "./lib";
 
 const DEFAULT_FORBES_URL = "https://www.forbes.com/top-colleges/";
 const FORBES_LIST_API = "https://www.forbes.com/lists-api/getListData";
@@ -99,7 +99,7 @@ async function main() {
     throw new Error(`Forbes list API returned only ${top50.length} colleges. Expected 50.`);
   }
 
-  await writeForbesData({
+  await writeRankingData({
     source: {
       name: "Forbes Top Colleges",
       url,
