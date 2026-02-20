@@ -14,11 +14,14 @@
     "data:refresh": "npm run data:forbes && npm run data:scorecard && npm run data:build"
   },
   "dependencies": {
+    "leaflet": "1.9.4",
     "next": "15.1.7",
     "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "react-dom": "19.0.0",
+    "react-leaflet": "5.0.0"
   },
   "devDependencies": {
+    "@types/leaflet": "1.9.15",
     "@types/node": "22.13.10",
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4",

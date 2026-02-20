@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import CollegeMapPanel from "@/app/college-map-panel";
 import type { CollegeRecord } from "@/lib/types";
 import { formatMoney, formatPercent, localeBucket, ownershipLabel } from "@/lib/format";
 
@@ -34,10 +35,8 @@ export default function CollegeExplorer({ colleges, fetchedAt, rankingSource }: 
         text(c.state).includes(normalized);
 
       const matchesState = state === "all" || c.state === state;
-
       const label = ownershipLabel(c.ownership).toLowerCase();
       const matchesOwnership = ownership === "all" || label === ownership;
-
       const bucket = localeBucket(c.locale);
       const matchesLocale = locale === "all" || bucket === locale;
 
@@ -47,12 +46,33 @@ export default function CollegeExplorer({ colleges, fetchedAt, rankingSource }: 
 
   return (
     <>
-      <section className="hero">
-        <h1>College Compass</h1>
-        <p>
-          Forbes Top 50 colleges with standardized metrics from College Scorecard. Compare cost, admissions,
-          outcomes, and location context in one place.
-        </p>
+      <section className="hero-panel">
+        <div>
+          <p className="kicker">College Search MVP</p>
+          <h1>College Compass</h1>
+          <p>
+            A better way for students to compare top schools. Explore admissions, outcomes, cost of attendance, and
+            setting context across the Forbes top 50.
+          </p>
+        </div>
+
+        <div className="hero-metrics">
+          <div className="hero-metric-card">
+            <b>Schools Indexed</b>
+            <span>{colleges.length}</span>
+          </div>
+          <div className="hero-metric-card">
+            <b>Visible</b>
+            <span>{filtered.length}</span>
+          </div>
+          <div className="hero-metric-card">
+            <b>Updated</b>
+            <span>{new Date(fetchedAt).toLocaleDateString()}</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="controls-shell">
         <div className="filters">
           <input
             placeholder="Search by college, city, or state"
@@ -80,18 +100,26 @@ export default function CollegeExplorer({ colleges, fetchedAt, rankingSource }: 
             <option value="rural">Rural</option>
           </select>
         </div>
-        <p className="meta" style={{ color: "rgba(255,255,255,0.9)", marginTop: "0.7rem" }}>
-          Showing {filtered.length} of {colleges.length} schools. Ranking source: <a href={rankingSource.url}>{rankingSource.name}</a>. Data last refreshed: {new Date(fetchedAt).toLocaleString()}.
+
+        <p className="meta controls-meta">
+          Ranking source: <a href={rankingSource.url}>{rankingSource.name}</a>
         </p>
+      </section>
+
+      <CollegeMapPanel colleges={filtered} />
+
+      <section className="cards-header">
+        <h2>College Cards</h2>
+        <p className="meta">Click a card to open the full profile.</p>
       </section>
 
       <section className="grid" aria-label="College results">
         {filtered.map((college) => (
           <Link key={college.slug} href={`/colleges/${college.slug}`} className="card">
             <span className="badge">#{college.rank}</span>
-            <h2 style={{ margin: "0.5rem 0 0.25rem" }}>{college.forbesName}</h2>
+            <h3>{college.forbesName}</h3>
             <div className="meta">
-              {college.city && college.state ? `${college.city}, ${college.state}` : "Location not available"} • {ownershipLabel(college.ownership)}
+              {college.city && college.state ? `${college.city}, ${college.state}` : "Location not available"} · {ownershipLabel(college.ownership)}
             </div>
             <div className="stats">
               <div className="stat">

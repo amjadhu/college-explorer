@@ -1,25 +1,34 @@
+@import "leaflet/dist/leaflet.css";
+
 :root {
-  --bg: #f4f3ef;
-  --paper: #fffdf8;
-  --ink: #1b1e24;
-  --muted: #61687a;
-  --accent: #0f4c5c;
-  --accent-soft: #e8f3f5;
-  --line: #d9d8d2;
+  --bg: #f2efe7;
+  --paper: #fffcf5;
+  --ink: #111827;
+  --muted: #4b5563;
+  --line: #d6d3cc;
+  --brand-1: #0b5d5a;
+  --brand-2: #de6b48;
+  --brand-3: #1f3b73;
+  --lift: 0 16px 32px rgba(12, 26, 47, 0.12);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  font-family: var(--font-body), "Avenir Next", "Segoe UI", sans-serif;
+  padding: 0;
+}
+
+body {
   color: var(--ink);
+  font-family: var(--font-body), "Segoe UI", sans-serif;
   background:
-    radial-gradient(circle at 20% 0%, #ffeed3 0%, transparent 35%),
-    radial-gradient(circle at 85% 10%, #d8f3f0 0%, transparent 30%),
-    var(--bg);
+    radial-gradient(circle at 10% -10%, #f5d8be 0%, transparent 28%),
+    radial-gradient(circle at 92% 6%, #dcecef 0%, transparent 26%),
+    linear-gradient(180deg, #f5f1e9 0%, #efebdf 100%);
 }
 
 a {
@@ -28,51 +37,284 @@ a {
 }
 
 main {
-  max-width: 1120px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem 4rem;
+  padding: 2.2rem 1.1rem 3.6rem;
 }
 
 h1,
 h2,
 h3 {
   font-family: var(--font-heading), "Avenir Next", sans-serif;
+  letter-spacing: -0.02em;
+  margin: 0;
 }
 
-.hero {
-  background: linear-gradient(130deg, #0f4c5c, #1a6f74 60%, #2f9c95);
+.kicker {
+  margin: 0;
+  color: #ffefe9;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  font-size: 0.76rem;
+}
+
+.hero-panel {
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: 1.6fr 1fr;
+  border-radius: 24px;
+  padding: 1.6rem;
   color: white;
-  padding: 2rem;
-  border-radius: 20px;
-  box-shadow: 0 18px 40px rgba(15, 76, 92, 0.2);
+  background: linear-gradient(128deg, var(--brand-3) 0%, #14606f 46%, #2b9a88 100%);
+  box-shadow: var(--lift);
 }
 
-.hero p {
+.hero-panel h1 {
+  margin-top: 0.3rem;
+  font-size: clamp(2rem, 4.8vw, 3.4rem);
+}
+
+.hero-panel p {
   color: rgba(255, 255, 255, 0.9);
+  max-width: 56ch;
+}
+
+.hero-metrics {
+  display: grid;
+  gap: 0.75rem;
+  align-content: center;
+}
+
+.hero-metric-card {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 14px;
+  padding: 0.75rem 0.9rem;
+}
+
+.hero-metric-card b {
+  display: block;
+  font-size: 0.76rem;
+  opacity: 0.85;
+}
+
+.hero-metric-card span {
+  font-family: var(--font-heading), "Avenir Next", sans-serif;
+  font-size: 1.22rem;
+}
+
+.controls-shell {
+  margin-top: 1rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1rem;
 }
 
 .filters {
-  margin-top: 1rem;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
+  gap: 0.7rem;
 }
 
 .filters input,
 .filters select {
   width: 100%;
-  border: 1px solid var(--line);
+  border: 1px solid #c9c7bf;
   border-radius: 12px;
-  padding: 0.6rem 0.7rem;
+  padding: 0.7rem 0.76rem;
   background: white;
+  color: var(--ink);
   font: inherit;
 }
 
+.controls-meta {
+  margin: 0.7rem 0 0;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.map-shell {
+  margin-top: 1rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 1rem;
+  box-shadow: 0 10px 24px rgba(20, 24, 32, 0.06);
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+}
+
+.map-layout {
+  margin-top: 0.8rem;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0.8rem;
+}
+
+.map-list {
+  border: 1px solid #e6e2d8;
+  border-radius: 14px;
+  background: white;
+  padding: 0.5rem;
+  max-height: 500px;
+  overflow: auto;
+}
+
+.map-list-item {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 0.56rem 0.6rem;
+  text-align: left;
+  background: #fbfaf7;
+  cursor: pointer;
+  margin-bottom: 0.42rem;
+  color: var(--ink);
+}
+
+.map-list-item span {
+  display: inline-block;
+  margin-right: 0.4rem;
+  color: #466078;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.map-list-item strong {
+  font-weight: 650;
+  font-size: 0.9rem;
+}
+
+.map-list-item.active {
+  border-color: #98c8c3;
+  background: #eef8f6;
+}
+
+.map-stage {
+  position: relative;
+  min-height: 500px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #dfddd3;
+}
+
+.college-map-canvas {
+  height: 100%;
+  min-height: 500px;
+  width: 100%;
+}
+
+.map-loading {
+  height: 500px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #e5efed 0%, #f7f3e8 100%);
+  color: #365167;
+  font-weight: 600;
+}
+
+.map-info-card {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: min(360px, calc(100% - 24px));
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(6px);
+  border: 1px solid #d6d3ca;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(11, 24, 40, 0.18);
+  padding: 0.8rem;
+  z-index: 400;
+}
+
+.map-dismiss {
+  border: 1px solid #d7d4cc;
+  background: #f7f4ed;
+  color: #334155;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.74rem;
+  padding: 0.28rem 0.6rem;
+  cursor: pointer;
+  float: right;
+}
+
+.map-info-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.3rem;
+  padding-right: 4.5rem;
+  font-size: 1.1rem;
+}
+
+.map-info-grid {
+  margin-top: 0.5rem;
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.map-detail-link {
+  margin-top: 0.6rem;
+  display: inline-block;
+  color: #12406b;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.map-legend {
+  margin-top: 0.8rem;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.legend-label {
+  font-weight: 700;
+  color: #3f4b5f;
+  margin-right: 0.2rem;
+}
+
+.legend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid #d4d0c7;
+  background: white;
+  border-radius: 999px;
+  padding: 0.24rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.legend-chip i {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.cards-header {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
 .grid {
-  margin-top: 1.25rem;
+  margin-top: 0.75rem;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.9rem;
+  gap: 0.85rem;
 }
 
 .card {
@@ -84,44 +326,45 @@ h3 {
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(16, 33, 54, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(18, 26, 40, 0.11);
+}
+
+.card h3 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.3rem;
+  font-size: 1.9rem;
+  line-height: 1.04;
 }
 
 .badge {
   display: inline-block;
-  padding: 0.18rem 0.48rem;
-  border-radius: 100px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  background: var(--accent-soft);
-  color: var(--accent);
-}
-
-.meta {
-  margin-top: 0.5rem;
-  color: var(--muted);
-  font-size: 0.93rem;
+  padding: 0.16rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.77rem;
+  font-weight: 800;
+  color: #124064;
+  background: #d8ecf3;
 }
 
 .stats {
-  margin-top: 0.9rem;
+  margin-top: 0.8rem;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.55rem;
+  gap: 0.52rem;
 }
 
 .stat {
-  border-radius: 12px;
-  background: #f6f8fa;
-  border: 1px solid #eceef2;
+  border-radius: 11px;
+  background: #f6f8fb;
+  border: 1px solid #e8ebf0;
   padding: 0.56rem;
 }
 
 .stat b {
   display: block;
-  font-size: 0.78rem;
-  color: var(--muted);
+  font-size: 0.74rem;
+  color: #566178;
   margin-bottom: 0.2rem;
 }
 
@@ -139,14 +382,25 @@ h3 {
   gap: 0.8rem;
 }
 
-@media (max-width: 900px) {
-  .filters {
-    grid-template-columns: 1fr 1fr;
+@media (max-width: 980px) {
+  .hero-panel,
+  .map-layout {
+    grid-template-columns: 1fr;
   }
 
+  .map-list {
+    max-height: 200px;
+  }
+
+  .filters,
   .grid,
   .detail-grid,
-  .stats {
+  .stats,
+  .map-info-grid {
     grid-template-columns: 1fr;
+  }
+
+  .card h3 {
+    font-size: 1.55rem;
   }
 }

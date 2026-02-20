@@ -6,7 +6,7 @@ export type CollegeRecord = {
   city: string | null;
   state: string | null;
   website: string | null;
-  locale: string | null;
+  locale: string | number | null;
   ownership: number | null;
   enrollment: number | null;
   admissionRate: number | null;

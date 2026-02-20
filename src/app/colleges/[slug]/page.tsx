@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCollegeBySlug, readColleges } from "@/lib/data";
-import { formatMoney, formatPercent, ownershipLabel } from "@/lib/format";
+import { formatMoney, formatPercent, localeLabel, ownershipLabel } from "@/lib/format";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -77,7 +77,7 @@ export default async function CollegePage({ params }: Props) {
           </div>
           <div className="stat">
             <b>Campus setting</b>
-            <span>{college.locale ?? "N/A"}</span>
+            <span>{college.locale ? localeLabel(college.locale) : "N/A"}</span>
           </div>
           <div className="stat">
             <b>Coordinates</b>
