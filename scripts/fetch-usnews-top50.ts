@@ -41,19 +41,34 @@ type UsNewsSearchResponse = {
 };
 
 async function fetchPage(url: string): Promise<UsNewsSearchResponse> {
-  const res = await fetch(url, {
-    headers: {
-      "user-agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-      accept: "application/json"
+  for (let attempt = 1; attempt <= 4; attempt += 1) {
+    try {
+      const res = await fetch(url, {
+        headers: {
+          "user-agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+          accept: "application/json"
+        }
+      });
+
+      if (!res.ok) {
+        if ((res.status >= 500 || res.status === 429) && attempt < 4) {
+          await new Promise((resolve) => setTimeout(resolve, attempt * 600));
+          continue;
+        }
+        throw new Error(`US News search API failed (${res.status} ${res.statusText}) for ${url}.`);
+      }
+
+      return (await res.json()) as UsNewsSearchResponse;
+    } catch (error) {
+      if (attempt < 4) {
+        await new Promise((resolve) => setTimeout(resolve, attempt * 800));
+        continue;
+      }
+      throw error;
     }
-  });
-
-  if (!res.ok) {
-    throw new Error(`US News search API failed (${res.status} ${res.statusText}) for ${url}.`);
   }
-
-  return (await res.json()) as UsNewsSearchResponse;
+  throw new Error(`US News search API failed after retries for ${url}.`);
 }
 
 async function main() {
