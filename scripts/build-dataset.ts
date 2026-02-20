@@ -18,7 +18,7 @@ async function main() {
       admissionRate: (scorecard?.["latest.admissions.admission_rate.overall"] as number | undefined) ?? null,
       tuitionInState: (scorecard?.["latest.cost.tuition.in_state"] as number | undefined) ?? null,
       tuitionOutOfState: (scorecard?.["latest.cost.tuition.out_of_state"] as number | undefined) ?? null,
-      avgNetPrice: (scorecard?.["latest.cost.avg_net_price.overall"] as number | undefined) ?? null,
+      costOfAttendance: (scorecard?.["latest.cost.attendance.academic_year"] as number | undefined) ?? null,
       graduationRate: (scorecard?.["latest.completion.rate_suppressed.overall"] as number | undefined) ?? null,
       medianEarnings10y: (scorecard?.["latest.earnings.10_yrs_after_entry.median"] as number | undefined) ?? null,
       latitude: (scorecard?.["location.lat"] as number | undefined) ?? null,

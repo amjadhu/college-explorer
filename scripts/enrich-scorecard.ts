@@ -14,7 +14,7 @@ type ScorecardSchool = {
   "latest.admissions.admission_rate.overall": number | null;
   "latest.cost.tuition.in_state": number | null;
   "latest.cost.tuition.out_of_state": number | null;
-  "latest.cost.avg_net_price.overall": number | null;
+  "latest.cost.attendance.academic_year": number | null;
   "latest.completion.rate_suppressed.overall": number | null;
   "latest.earnings.10_yrs_after_entry.median": number | null;
 };
@@ -35,7 +35,7 @@ const fields = [
   "latest.admissions.admission_rate.overall",
   "latest.cost.tuition.in_state",
   "latest.cost.tuition.out_of_state",
-  "latest.cost.avg_net_price.overall",
+  "latest.cost.attendance.academic_year",
   "latest.completion.rate_suppressed.overall",
   "latest.earnings.10_yrs_after_entry.median"
 ].join(",");

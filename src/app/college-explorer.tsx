@@ -99,8 +99,8 @@ export default function CollegeExplorer({ colleges, fetchedAt, rankingSource }: 
                 <span>{formatPercent(college.admissionRate)}</span>
               </div>
               <div className="stat">
-                <b>Net Cost</b>
-                <span>{formatMoney(college.avgNetPrice)}</span>
+                <b>Cost of Attendance</b>
+                <span>{formatMoney(college.costOfAttendance)}</span>
               </div>
               <div className="stat">
                 <b>10y Earnings</b>

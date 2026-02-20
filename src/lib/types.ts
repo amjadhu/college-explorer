@@ -12,7 +12,7 @@ export type CollegeRecord = {
   admissionRate: number | null;
   tuitionInState: number | null;
   tuitionOutOfState: number | null;
-  avgNetPrice: number | null;
+  costOfAttendance: number | null;
   graduationRate: number | null;
   medianEarnings10y: number | null;
   latitude: number | null;

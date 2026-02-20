@@ -58,8 +58,8 @@ export default async function CollegePage({ params }: Props) {
             <span>{formatMoney(college.tuitionOutOfState)}</span>
           </div>
           <div className="stat">
-            <b>Average net price</b>
-            <span>{formatMoney(college.avgNetPrice)}</span>
+            <b>Cost of attendance</b>
+            <span>{formatMoney(college.costOfAttendance)}</span>
           </div>
           <div className="stat">
             <b>Enrollment</b>
