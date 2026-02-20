@@ -1,11 +1,12 @@
 import { slugify, writeRankingData } from "./lib";
+import { pathToFileURL } from "node:url";
 
 const DEFAULT_FORBES_URL = "https://www.forbes.com/top-colleges/";
 const FORBES_LIST_API = "https://www.forbes.com/lists-api/getListData";
 
 const encode = (value: string | number): string => Buffer.from(String(value), "utf-8").toString("base64");
 
-async function main() {
+export async function fetchForbesTop50() {
   const url = process.env.FORBES_RANKING_URL || DEFAULT_FORBES_URL;
   const res = await fetch(url, {
     headers: {
@@ -111,7 +112,12 @@ async function main() {
   console.log(`Saved Forbes top ${top50.length} colleges from ${url}.`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+const isDirectRun =
+  Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isDirectRun) {
+  fetchForbesTop50().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

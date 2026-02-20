@@ -1,4 +1,5 @@
 import { slugify, writeRankingData } from "./lib";
+import { pathToFileURL } from "node:url";
 
 const DEFAULT_USNEWS_URL = "https://www.usnews.com/best-colleges/rankings/national-universities";
 const USNEWS_SEARCH_API = "https://www.usnews.com/best-colleges/api/search?format=json";
@@ -76,7 +77,7 @@ async function fetchPage(url: string): Promise<UsNewsSearchResponse> {
   throw new Error(`US News search API failed after retries for ${url}.`);
 }
 
-async function main() {
+export async function fetchUsNewsTop50() {
   const url = process.env.USNEWS_RANKING_URL || DEFAULT_USNEWS_URL;
   const schoolType = parseSchoolTypeFromUrl(url);
   let nextUrl = `${USNEWS_SEARCH_API}&${new URLSearchParams({
@@ -134,7 +135,12 @@ async function main() {
   console.log(`Saved U.S. News top ${top50.length} colleges from ${url}.`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+const isDirectRun =
+  Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isDirectRun) {
+  fetchUsNewsTop50().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}
