@@ -22,14 +22,16 @@ export default function CollegeExplorer({ colleges, fetchedAt, rankingSource }: 
     [colleges]
   );
 
+  const text = (value: unknown): string => (typeof value === "string" ? value.toLowerCase() : "");
+
   const filtered = useMemo(() => {
     return colleges.filter((c) => {
       const normalized = query.toLowerCase().trim();
       const matchesQuery =
         !normalized ||
-        c.forbesName.toLowerCase().includes(normalized) ||
-        c.city?.toLowerCase().includes(normalized) ||
-        c.state?.toLowerCase().includes(normalized);
+        text(c.forbesName).includes(normalized) ||
+        text(c.city).includes(normalized) ||
+        text(c.state).includes(normalized);
 
       const matchesState = state === "all" || c.state === state;
 

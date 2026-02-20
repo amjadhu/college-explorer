@@ -19,7 +19,7 @@ export const ownershipLabel = (ownership: number | null): "Public" | "Private" |
 };
 
 export const localeBucket = (locale: string | null): "city" | "suburb" | "town" | "rural" | "unknown" => {
-  if (!locale) return "unknown";
+  if (!locale || typeof locale !== "string") return "unknown";
   const normalized = locale.toLowerCase();
   if (normalized.includes("city")) return "city";
   if (normalized.includes("suburb")) return "suburb";
