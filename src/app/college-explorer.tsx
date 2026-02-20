@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { CollegeRecord } from "@/lib/types";
-import { formatMoney, formatPercent, localeBucket, ownershipLabel } from "@/lib/data";
+import { formatMoney, formatPercent, localeBucket, ownershipLabel } from "@/lib/format";
 
 type Props = {
   colleges: CollegeRecord[];

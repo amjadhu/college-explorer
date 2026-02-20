@@ -1,16 +1,9 @@
-import { load } from "cheerio";
 import { slugify, writeForbesData } from "./lib";
 
 const DEFAULT_FORBES_URL = "https://www.forbes.com/top-colleges/";
+const FORBES_LIST_API = "https://www.forbes.com/lists-api/getListData";
 
-const rankItemFromText = (text: string) => {
-  const match = text.match(/^\s*(\d{1,3})\.?\s+(.+)$/);
-  if (!match) return null;
-  const rank = Number(match[1]);
-  const name = match[2].trim();
-  if (!rank || !name) return null;
-  return { rank, name, slug: slugify(name) };
-};
+const encode = (value: string | number): string => Buffer.from(String(value), "utf-8").toString("base64");
 
 async function main() {
   const url = process.env.FORBES_RANKING_URL || DEFAULT_FORBES_URL;
@@ -26,59 +19,84 @@ async function main() {
   }
 
   const html = await res.text();
-  const $ = load(html);
+  const nextDataMatch = html.match(
+    /<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/
+  );
+  if (!nextDataMatch) {
+    throw new Error("Could not locate __NEXT_DATA__ on Forbes page.");
+  }
 
-  const byJsonLd: Array<{ rank: number; name: string; slug: string }> = [];
+  const nextData = JSON.parse(nextDataMatch[1]) as {
+    props?: {
+      pageProps?: {
+        schema?: {
+          year?: number;
+          listUri?: string;
+          sections?: Array<{
+            componentId?: string;
+            props?: {
+              filters?: { dropdowns?: Array<{ accessor: string }> };
+              searchFilterKey?: string[];
+              tableConfig?: { initialSort?: { key?: string; direction?: string } };
+            };
+          }>;
+        };
+      };
+    };
+  };
 
-  $("script[type='application/ld+json']").each((_, el) => {
-    const raw = $(el).text();
-    if (!raw) return;
+  const schema = nextData.props?.pageProps?.schema;
+  const year = schema?.year ?? new Date().getUTCFullYear();
+  const listUri = schema?.listUri ?? "top-colleges";
+  const tableSection = schema?.sections?.find((section) => section.componentId === "Table");
+  const searchKey = tableSection?.props?.searchFilterKey?.join(",") || "organizationName";
+  const filterFields =
+    tableSection?.props?.filters?.dropdowns?.map((dropdown) => dropdown.accessor).join(",") ||
+    "campusSetting,state,schoolSize";
+  const sortBy = tableSection?.props?.tableConfig?.initialSort?.key || "rank";
+  const sortOrder = tableSection?.props?.tableConfig?.initialSort?.direction?.toUpperCase() === "DESC" ? "DESC" : "ASC";
 
-    try {
-      const json = JSON.parse(raw);
-      const candidates = Array.isArray(json) ? json : [json];
-      for (const candidate of candidates) {
-        const list = candidate?.itemListElement;
-        if (!Array.isArray(list)) continue;
-        for (const item of list) {
-          const rank = Number(item?.position);
-          const name = String(item?.item?.name ?? item?.name ?? "").trim();
-          if (!rank || !name) continue;
-          byJsonLd.push({ rank, name, slug: slugify(name) });
-        }
-      }
-    } catch {
-      // Ignore parse failures for unrelated scripts.
+  const listApiUrl = `${FORBES_LIST_API}?${new URLSearchParams({
+    listUri: encode(listUri),
+    year: encode(year),
+    limit: encode(50),
+    sortBy: encode(sortBy),
+    sortOrder: encode(sortOrder),
+    search: encode(""),
+    searchKey: encode(searchKey),
+    offset: encode(0),
+    filter: encode(""),
+    filterFields: encode(filterFields)
+  }).toString()}`;
+
+  const listRes = await fetch(listApiUrl, {
+    headers: {
+      "user-agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
     }
   });
 
-  let extracted = byJsonLd;
-
-  if (extracted.length < 50) {
-    const byRows: Array<{ rank: number; name: string; slug: string }> = [];
-    $("tr, li, div").each((_, el) => {
-      const text = $(el).text().trim();
-      if (!text) return;
-      const maybe = rankItemFromText(text);
-      if (maybe && maybe.rank <= 200) byRows.push(maybe);
-    });
-
-    const deduped = new Map<number, { rank: number; name: string; slug: string }>();
-    for (const item of byRows) {
-      if (!deduped.has(item.rank)) deduped.set(item.rank, item);
-    }
-    extracted = [...deduped.values()];
+  if (!listRes.ok) {
+    throw new Error(`Could not fetch Forbes list API (${listRes.status} ${listRes.statusText}).`);
   }
 
-  const top50 = extracted
-    .filter((x) => x.rank > 0)
+  const payload = (await listRes.json()) as {
+    data?: Array<{ rank?: string | number; organizationName?: string }>;
+  };
+
+  const top50 = (payload.data ?? [])
+    .map((item) => {
+      const rank = Number(item.rank);
+      const name = item.organizationName?.trim();
+      if (!rank || !name) return null;
+      return { rank, name, slug: slugify(name) };
+    })
+    .filter((item): item is { rank: number; name: string; slug: string } => Boolean(item))
     .sort((a, b) => a.rank - b.rank)
     .slice(0, 50);
 
   if (top50.length < 50) {
-    throw new Error(
-      `Only extracted ${top50.length} ranked colleges. Forbes markup likely changed. Update parser in scripts/fetch-forbes-top50.ts.`
-    );
+    throw new Error(`Forbes list API returned only ${top50.length} colleges. Expected 50.`);
   }
 
   await writeForbesData({

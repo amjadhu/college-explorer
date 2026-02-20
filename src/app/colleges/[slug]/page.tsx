@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { formatMoney, formatPercent, getCollegeBySlug, ownershipLabel, readColleges } from "@/lib/data";
+import { getCollegeBySlug, readColleges } from "@/lib/data";
+import { formatMoney, formatPercent, ownershipLabel } from "@/lib/format";
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export const dynamicParams = false;
@@ -14,7 +15,7 @@ export async function generateStaticParams() {
 }
 
 export default async function CollegePage({ params }: Props) {
-  const { slug } = params;
+  const { slug } = await params;
   const college = await getCollegeBySlug(slug);
 
   if (!college) return notFound();

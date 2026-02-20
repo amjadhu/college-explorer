@@ -66,12 +66,17 @@ async function fetchSchoolByName(apiKey: string, name: string): Promise<Scorecar
 
 async function main() {
   const apiKey = process.env.COLLEGE_SCORECARD_API_KEY;
+  const forbes = await readForbesData();
 
   if (!apiKey) {
-    throw new Error("COLLEGE_SCORECARD_API_KEY is missing. Add it to your environment and re-run.");
+    console.warn("COLLEGE_SCORECARD_API_KEY is missing. Writing dataset with Forbes rankings only.");
+    await writeScorecardData({
+      source: forbes.source,
+      fetchedAt: new Date().toISOString(),
+      colleges: forbes.colleges.map((college) => ({ forbes: college, scorecard: null }))
+    });
+    return;
   }
-
-  const forbes = await readForbesData();
   const enriched: Array<{ forbes: (typeof forbes.colleges)[number]; scorecard: ScorecardSchool | null }> = [];
 
   for (const item of forbes.colleges) {

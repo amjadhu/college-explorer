@@ -30,6 +30,7 @@ export async function writeScorecardData(data: object) {
 }
 
 export async function readScorecardData(): Promise<{
+  source: { name: string; url: string; fetchedAt: string };
   fetchedAt: string;
   colleges: Array<{ forbes: ForbesRankItem; scorecard: Record<string, unknown> | null }>;
 }> {
