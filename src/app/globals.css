@@ -678,6 +678,14 @@ h3 {
   border-radius: 10px;
   background: #fff;
   padding: 0.48rem;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.setting-bar-row.active {
+  border-color: #8bb7cf;
+  background: #eef6fb;
 }
 
 .setting-card {
@@ -743,6 +751,14 @@ h3 {
   border-radius: 10px;
   background: #fff;
   padding: 0.5rem;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.major-bar-row.active {
+  border-color: #8bb7cf;
+  background: #eef6fb;
 }
 
 .major-label-row {
@@ -885,6 +901,7 @@ h3 {
   border: 1px solid #e2d8cb;
   border-radius: 999px;
   padding: 0.05rem 0.35rem;
+  cursor: pointer;
 }
 
 .plot-quadrant.q1 {
@@ -905,6 +922,12 @@ h3 {
 .plot-quadrant.q4 {
   right: 2%;
   bottom: 2%;
+}
+
+.plot-quadrant.active {
+  border-color: #2f5874;
+  background: #e5eff8;
+  color: #1c3651;
 }
 
 .plot-dot {
@@ -995,6 +1018,61 @@ h3 {
   margin-top: 0.12rem;
   font-weight: 700;
   color: #163859;
+}
+
+.viz-filter-panel {
+  margin-top: 0.65rem;
+  border: 1px solid #dbd1c2;
+  border-radius: 10px;
+  background: #fffcf6;
+  padding: 0.6rem;
+}
+
+.viz-filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.viz-filter-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.viz-college-list {
+  margin-top: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.viz-college-list button {
+  border: 1px solid #e5dacb;
+  border-radius: 9px;
+  background: #fff;
+  text-align: left;
+  padding: 0.42rem;
+  cursor: pointer;
+}
+
+.viz-college-list span {
+  display: inline-block;
+  margin-right: 0.3rem;
+  font-size: 0.75rem;
+  color: #4d5b72;
+  font-weight: 700;
+}
+
+.viz-college-list b {
+  font-size: 0.84rem;
+}
+
+.viz-college-list small {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.74rem;
+  color: #5a667e;
 }
 
 .inline-info-card {
@@ -1142,7 +1220,8 @@ h3 {
   .detail-grid,
   .setting-grid,
   .major-insights,
-  .setting-takeaways {
+  .setting-takeaways,
+  .viz-college-list {
     grid-template-columns: 1fr;
   }
 

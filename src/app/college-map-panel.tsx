@@ -17,6 +17,7 @@ type Props = {
 };
 
 type ViewMode = "map" | "cost" | "setting" | "majors" | "value";
+type ValueQuadrant = "q1" | "q2" | "q3" | "q4";
 
 type MapItem = {
   slug: string;
@@ -77,6 +78,9 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
 
   const [view, setView] = useState<ViewMode>("map");
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
+  const [activeSetting, setActiveSetting] = useState<SettingBucket | null>(null);
+  const [activeMajorKey, setActiveMajorKey] = useState<string | null>(null);
+  const [activeQuadrant, setActiveQuadrant] = useState<ValueQuadrant | null>(null);
 
   const selected = mapItems.find((item) => item.slug === selectedSlug) ?? null;
 
@@ -209,14 +213,51 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
           ? 50
           : ((earnings - valueBounds.minEarnings) / (valueBounds.maxEarnings - valueBounds.minEarnings)) * 100;
       const valueScore = (1 - x / 100) * 0.5 + (y / 100) * 0.5;
+      const quadrant: ValueQuadrant = x <= 50 ? (y >= 50 ? "q1" : "q3") : y >= 50 ? "q2" : "q4";
 
-      return { ...item, x, y, valueScore };
+      return { ...item, x, y, valueScore, quadrant };
     });
   }, [valueBounds.maxCost, valueBounds.maxEarnings, valueBounds.minCost, valueBounds.minEarnings, valueItems]);
 
   const rankedValuePoints = useMemo(
     () => [...valuePoints].sort((a, b) => b.valueScore - a.valueScore || a.rank - b.rank),
     [valuePoints]
+  );
+
+  const quadrantCounts = useMemo(() => {
+    return {
+      q1: valuePoints.filter((point) => point.quadrant === "q1").length,
+      q2: valuePoints.filter((point) => point.quadrant === "q2").length,
+      q3: valuePoints.filter((point) => point.quadrant === "q3").length,
+      q4: valuePoints.filter((point) => point.quadrant === "q4").length
+    };
+  }, [valuePoints]);
+
+  const settingFiltered = useMemo(
+    () => (activeSetting ? mapItems.filter((item) => item.settingBucket === activeSetting) : []),
+    [activeSetting, mapItems]
+  );
+
+  const majorFiltered = useMemo(() => {
+    if (!activeMajorKey) return [];
+
+    return mapItems
+      .filter((item) => item.topMajors.some((major) => major.key === activeMajorKey))
+      .map((item) => ({
+        ...item,
+        majorShare: item.topMajors.find((major) => major.key === activeMajorKey)?.share ?? null
+      }))
+      .sort((a, b) => (b.majorShare ?? 0) - (a.majorShare ?? 0));
+  }, [activeMajorKey, mapItems]);
+
+  const valueFiltered = useMemo(
+    () => (activeQuadrant ? rankedValuePoints.filter((point) => point.quadrant === activeQuadrant) : []),
+    [activeQuadrant, rankedValuePoints]
+  );
+
+  const activeMajorLabel = useMemo(
+    () => majorStats.find((major) => major.key === activeMajorKey)?.label ?? null,
+    [activeMajorKey, majorStats]
   );
 
   if (!mapItems.length) {
@@ -380,7 +421,12 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
 
           <div className="setting-bars">
             {settingStats.map((row) => (
-              <article key={row.setting} className="setting-bar-row">
+              <button
+                key={row.setting}
+                type="button"
+                className={`setting-bar-row ${activeSetting === row.setting ? "active" : ""}`}
+                onClick={() => setActiveSetting((current) => (current === row.setting ? null : row.setting))}
+              >
                 <div className="setting-top">
                   <span className="dot" style={{ background: row.color }} />
                   <strong>{row.label}</strong>
@@ -393,9 +439,29 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
                   <span>Avg cost {formatMoney(row.avgCost ? Math.round(row.avgCost) : null)}</span>
                   <span>Avg earnings {formatMoney(row.avgEarnings ? Math.round(row.avgEarnings) : null)}</span>
                 </div>
-              </article>
+              </button>
             ))}
           </div>
+
+          {activeSetting && (
+            <div className="viz-filter-panel">
+              <div className="viz-filter-header">
+                <h4>Colleges in {activeSetting === "unknown" ? "Unknown" : activeSetting}</h4>
+                <button type="button" className="ghost" onClick={() => setActiveSetting(null)}>
+                  Clear
+                </button>
+              </div>
+              <div className="viz-college-list">
+                {settingFiltered.map((item) => (
+                  <button key={item.slug} type="button" onClick={() => setSelectedSlug(item.slug)}>
+                    <span>#{item.rank}</span>
+                    <b>{item.name}</b>
+                    <small>{item.city && item.state ? `${item.city}, ${item.state}` : "Location unavailable"}</small>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -429,7 +495,12 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
 
           <div className="major-bars">
             {majorStats.map((major) => (
-              <article key={major.key} className="major-bar-row">
+              <button
+                key={major.key}
+                type="button"
+                className={`major-bar-row ${activeMajorKey === major.key ? "active" : ""}`}
+                onClick={() => setActiveMajorKey((current) => (current === major.key ? null : major.key))}
+              >
                 <div className="major-label-row">
                   <strong>{major.label}</strong>
                   <span>{major.count} schools</span>
@@ -438,9 +509,31 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
                   <i style={{ width: `${((major.count / Math.max(mapItems.length, 1)) * 100).toFixed(2)}%` }} />
                 </div>
                 <p className="meta">Avg share {formatMajorShare(major.avgShare)}</p>
-              </article>
+              </button>
             ))}
           </div>
+
+          {activeMajorKey && (
+            <div className="viz-filter-panel">
+              <div className="viz-filter-header">
+                <h4>Colleges strong in {activeMajorLabel ?? "selected major"}</h4>
+                <button type="button" className="ghost" onClick={() => setActiveMajorKey(null)}>
+                  Clear
+                </button>
+              </div>
+              <div className="viz-college-list">
+                {majorFiltered.map((item) => (
+                  <button key={item.slug} type="button" onClick={() => setSelectedSlug(item.slug)}>
+                    <span>#{item.rank}</span>
+                    <b>{item.name}</b>
+                    <small>
+                      {item.majorShare != null ? `Major share ${formatMajorShare(item.majorShare)}` : "Major share unavailable"}
+                    </small>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -461,16 +554,45 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
                 <div className="value-plot">
                   <div className="plot-midline-x" />
                   <div className="plot-midline-y" />
-                  <span className="plot-quadrant q1">High earnings, low cost</span>
-                  <span className="plot-quadrant q2">High earnings, high cost</span>
-                  <span className="plot-quadrant q3">Lower earnings, low cost</span>
-                  <span className="plot-quadrant q4">Lower earnings, high cost</span>
+                  <button
+                    type="button"
+                    className={`plot-quadrant q1 ${activeQuadrant === "q1" ? "active" : ""}`}
+                    onClick={() => setActiveQuadrant((current) => (current === "q1" ? null : "q1"))}
+                  >
+                    High earnings, low cost ({quadrantCounts.q1})
+                  </button>
+                  <button
+                    type="button"
+                    className={`plot-quadrant q2 ${activeQuadrant === "q2" ? "active" : ""}`}
+                    onClick={() => setActiveQuadrant((current) => (current === "q2" ? null : "q2"))}
+                  >
+                    High earnings, high cost ({quadrantCounts.q2})
+                  </button>
+                  <button
+                    type="button"
+                    className={`plot-quadrant q3 ${activeQuadrant === "q3" ? "active" : ""}`}
+                    onClick={() => setActiveQuadrant((current) => (current === "q3" ? null : "q3"))}
+                  >
+                    Lower earnings, low cost ({quadrantCounts.q3})
+                  </button>
+                  <button
+                    type="button"
+                    className={`plot-quadrant q4 ${activeQuadrant === "q4" ? "active" : ""}`}
+                    onClick={() => setActiveQuadrant((current) => (current === "q4" ? null : "q4"))}
+                  >
+                    Lower earnings, high cost ({quadrantCounts.q4})
+                  </button>
                   {valuePoints.map((item) => (
                     <button
                       key={item.slug}
                       type="button"
                       className={`plot-dot ${selectedSlug === item.slug ? "active" : ""}`}
-                      style={{ left: `${item.x}%`, bottom: `${item.y}%`, background: item.markerColor }}
+                      style={{
+                        left: `${item.x}%`,
+                        bottom: `${item.y}%`,
+                        background: item.markerColor,
+                        opacity: activeQuadrant && item.quadrant !== activeQuadrant ? 0.18 : 1
+                      }}
                       onClick={() => setSelectedSlug(item.slug)}
                       aria-label={`Select ${item.name}`}
                       title={`#${item.rank} ${item.name} | Cost ${formatMoney(item.costOfAttendance)} | Earnings ${formatMoney(item.medianEarnings10y)}`}
@@ -488,7 +610,7 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
             </div>
 
             <aside className="value-list" aria-label="Value chart college list">
-              {rankedValuePoints.map((item, index) => (
+              {(activeQuadrant ? valueFiltered : rankedValuePoints).map((item, index) => (
                 <button
                   key={item.slug}
                   type="button"
@@ -508,6 +630,18 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
               ))}
             </aside>
           </div>
+
+          {activeQuadrant && (
+            <div className="viz-filter-panel">
+              <div className="viz-filter-header">
+                <h4>Filtered to quadrant {activeQuadrant.toUpperCase()}</h4>
+                <button type="button" className="ghost" onClick={() => setActiveQuadrant(null)}>
+                  Clear
+                </button>
+              </div>
+              <p className="meta">Only schools in this quadrant are emphasized in the chart and list.</p>
+            </div>
+          )}
 
           {selected && (
             <article className="inline-info-card" role="dialog" aria-label="Selected college info">
