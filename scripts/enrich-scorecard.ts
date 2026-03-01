@@ -1,4 +1,5 @@
 import { readRankingData, scoreName, writeScorecardData } from "./lib";
+import { programFields } from "./majors";
 
 type ScorecardSchool = {
   id: number;
@@ -17,11 +18,12 @@ type ScorecardSchool = {
   "latest.cost.attendance.academic_year": number | null;
   "latest.completion.rate_suppressed.overall": number | null;
   "latest.earnings.10_yrs_after_entry.median": number | null;
+  [key: string]: unknown;
 };
 
 const endpoint = "https://api.data.gov/ed/collegescorecard/v1/schools";
 
-const fields = [
+const baseFields = [
   "id",
   "school.name",
   "school.city",
@@ -38,7 +40,9 @@ const fields = [
   "latest.cost.attendance.academic_year",
   "latest.completion.rate_suppressed.overall",
   "latest.earnings.10_yrs_after_entry.median"
-].join(",");
+];
+
+const fields = [...baseFields, ...programFields.map((field) => field.field)].join(",");
 
 async function fetchSchoolByName(apiKey: string, name: string): Promise<ScorecardSchool | null> {
   const params = new URLSearchParams();
@@ -51,7 +55,6 @@ async function fetchSchoolByName(apiKey: string, name: string): Promise<Scorecar
     const res = await fetch(`${endpoint}?${params.toString()}`);
 
     if (!res.ok) {
-      // Retry transient server errors/rate limits, then gracefully skip.
       if ((res.status >= 500 || res.status === 429) && attempt < 3) {
         await new Promise((resolve) => setTimeout(resolve, attempt * 500));
         continue;
@@ -87,6 +90,7 @@ async function main() {
     });
     return;
   }
+
   const enriched: Array<{ rankItem: (typeof rankingData.colleges)[number]; scorecard: ScorecardSchool | null }> = [];
 
   for (const item of rankingData.colleges) {
@@ -101,7 +105,7 @@ async function main() {
     colleges: enriched
   });
 
-  const found = enriched.filter((i) => i.scorecard).length;
+  const found = enriched.filter((item) => item.scorecard).length;
   console.log(`Enriched ${found}/${rankingData.colleges.length} colleges using College Scorecard.`);
 }
 

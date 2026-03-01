@@ -1,5 +1,5 @@
-import { slugify, writeRankingData } from "./lib";
 import { pathToFileURL } from "node:url";
+import { slugify, writeRankingData } from "./lib";
 
 const DEFAULT_USNEWS_URL = "https://www.usnews.com/best-colleges/rankings/national-universities";
 const USNEWS_SEARCH_API = "https://www.usnews.com/best-colleges/api/search?format=json";
@@ -17,8 +17,8 @@ const parseSchoolTypeFromUrl = (url: string): string => {
 const rankFromDisplay = (value: unknown): number | null => {
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
   if (typeof value !== "string") return null;
-  const m = value.match(/\d+/);
-  return m ? Number(m[0]) : null;
+  const match = value.match(/\d+/);
+  return match ? Number(match[0]) : null;
 };
 
 type UsNewsItem = {
@@ -45,6 +45,7 @@ async function fetchPage(url: string): Promise<UsNewsSearchResponse> {
   for (let attempt = 1; attempt <= 4; attempt += 1) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 12_000);
+
     try {
       const res = await fetch(url, {
         headers: {
@@ -60,6 +61,7 @@ async function fetchPage(url: string): Promise<UsNewsSearchResponse> {
           await new Promise((resolve) => setTimeout(resolve, attempt * 600));
           continue;
         }
+
         throw new Error(`US News search API failed (${res.status} ${res.statusText}) for ${url}.`);
       }
 
@@ -74,6 +76,7 @@ async function fetchPage(url: string): Promise<UsNewsSearchResponse> {
       clearTimeout(timeoutId);
     }
   }
+
   throw new Error(`US News search API failed after retries for ${url}.`);
 }
 
@@ -127,7 +130,8 @@ export async function fetchUsNewsTop50() {
     source: {
       name: "U.S. News Best Colleges",
       url,
-      fetchedAt: new Date().toISOString()
+      fetchedAt: new Date().toISOString(),
+      fallbackUsed: false
     },
     colleges: top50
   });
@@ -135,8 +139,7 @@ export async function fetchUsNewsTop50() {
   console.log(`Saved U.S. News top ${top50.length} colleges from ${url}.`);
 }
 
-const isDirectRun =
-  Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
+const isDirectRun = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (isDirectRun) {
   fetchUsNewsTop50().catch((error) => {

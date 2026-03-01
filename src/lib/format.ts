@@ -1,4 +1,4 @@
-export type LocaleBucket = "city" | "suburb" | "town" | "rural" | "unknown";
+import type { SettingBucket } from "@/lib/types";
 
 export const formatMoney = (value: number | null): string => {
   if (value == null) return "N/A";
@@ -14,13 +14,15 @@ export const formatPercent = (value: number | null): string => {
   return `${(value * 100).toFixed(1)}%`;
 };
 
+export const formatMajorShare = (value: number): string => `${(value * 100).toFixed(1)}%`;
+
 export const ownershipLabel = (ownership: number | null): "Public" | "Private" | "N/A" => {
   if (ownership === 1) return "Public";
   if (ownership === 2 || ownership === 3) return "Private";
   return "N/A";
 };
 
-export const localeBucket = (locale: unknown): LocaleBucket => {
+export const localeBucket = (locale: unknown): SettingBucket => {
   if (locale == null) return "unknown";
 
   const code = Number(locale);
@@ -40,8 +42,14 @@ export const localeBucket = (locale: unknown): LocaleBucket => {
   return "unknown";
 };
 
-export const localeLabel = (locale: unknown): string => {
-  const bucket = localeBucket(locale);
-  if (bucket === "unknown") return "Unknown setting";
-  return bucket[0].toUpperCase() + bucket.slice(1);
+const settingLabels: Record<SettingBucket, string> = {
+  city: "City",
+  suburb: "Suburb",
+  town: "Town",
+  rural: "Rural",
+  unknown: "Unknown setting"
 };
+
+export const localeLabel = (locale: unknown): string => settingLabels[localeBucket(locale)];
+
+export const settingLabelFromBucket = (bucket: SettingBucket): string => settingLabels[bucket];

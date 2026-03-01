@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test:unit": "node --import tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",
     "data:rankings": "tsx scripts/fetch-rankings.ts",
     "data:forbes": "tsx scripts/fetch-forbes-top50.ts",

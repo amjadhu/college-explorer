@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { CircleMarker, MapContainer, Popup, TileLayer, useMap } from "react-leaflet";
 import type { LatLngExpression } from "leaflet";
-import { formatMoney, formatPercent, localeLabel } from "@/lib/format";
+import { formatMoney, formatPercent } from "@/lib/format";
 
 type MapItem = {
   slug: string;
@@ -23,6 +23,7 @@ type MapItem = {
 type Props = {
   items: MapItem[];
   selectedSlug: string | null;
+  shortlistSlugs: string[];
   onSelect: (slug: string) => void;
 };
 
@@ -39,7 +40,7 @@ function MapFocus({ selected }: { selected: MapItem | null }) {
   return null;
 }
 
-export default function CollegeMapCanvas({ items, selectedSlug, onSelect }: Props) {
+export default function CollegeMapCanvas({ items, selectedSlug, shortlistSlugs, onSelect }: Props) {
   const selected = items.find((item) => item.slug === selectedSlug) ?? null;
 
   return (
@@ -53,26 +54,29 @@ export default function CollegeMapCanvas({ items, selectedSlug, onSelect }: Prop
 
       {items.map((item) => {
         const isSelected = item.slug === selectedSlug;
+        const isShortlisted = shortlistSlugs.includes(item.slug);
 
         return (
           <CircleMarker
             key={item.slug}
             center={[item.latitude, item.longitude]}
             pathOptions={{
-              color: isSelected ? "#fff" : item.markerColor,
-              weight: isSelected ? 3 : 1,
+              color: isSelected ? "#ffffff" : isShortlisted ? "#0b1f3a" : item.markerColor,
+              weight: isSelected ? 3 : isShortlisted ? 2 : 1,
               fillColor: item.markerColor,
               fillOpacity: isSelected ? 0.98 : 0.78
             }}
-            radius={isSelected ? 9 : 7}
+            radius={isSelected ? 10 : isShortlisted ? 8 : 7}
             eventHandlers={{ click: () => onSelect(item.slug) }}
           >
             <Popup>
-              <strong>#{item.rank} {item.name}</strong>
+              <strong>
+                #{item.rank} {item.name}
+              </strong>
               <br />
               {item.city && item.state ? `${item.city}, ${item.state}` : "Location unavailable"}
               <br />
-              Setting: {localeLabel(item.settingLabel)}
+              Setting: {item.settingLabel}
               <br />
               Acceptance: {formatPercent(item.admissionRate)}
               <br />

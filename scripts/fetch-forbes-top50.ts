@@ -1,12 +1,12 @@
-import { slugify, writeRankingData } from "./lib";
 import { pathToFileURL } from "node:url";
+import { slugify, writeRankingData } from "./lib";
 
 const DEFAULT_FORBES_URL = "https://www.forbes.com/top-colleges/";
 const FORBES_LIST_API = "https://www.forbes.com/lists-api/getListData";
 
 const encode = (value: string | number): string => Buffer.from(String(value), "utf-8").toString("base64");
 
-export async function fetchForbesTop50() {
+export async function fetchForbesTop50(options?: { fallbackFrom?: string }) {
   const url = process.env.FORBES_RANKING_URL || DEFAULT_FORBES_URL;
   const res = await fetch(url, {
     headers: {
@@ -20,9 +20,7 @@ export async function fetchForbesTop50() {
   }
 
   const html = await res.text();
-  const nextDataMatch = html.match(
-    /<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/
-  );
+  const nextDataMatch = html.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
   if (!nextDataMatch) {
     throw new Error("Could not locate __NEXT_DATA__ on Forbes page.");
   }
@@ -104,7 +102,9 @@ export async function fetchForbesTop50() {
     source: {
       name: "Forbes Top Colleges",
       url,
-      fetchedAt: new Date().toISOString()
+      fetchedAt: new Date().toISOString(),
+      fallbackUsed: Boolean(options?.fallbackFrom),
+      fallbackFrom: options?.fallbackFrom
     },
     colleges: top50
   });
@@ -112,8 +112,7 @@ export async function fetchForbesTop50() {
   console.log(`Saved Forbes top ${top50.length} colleges from ${url}.`);
 }
 
-const isDirectRun =
-  Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
+const isDirectRun = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (isDirectRun) {
   fetchForbesTop50().catch((error) => {
