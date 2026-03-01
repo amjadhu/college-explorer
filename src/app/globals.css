@@ -404,6 +404,38 @@ h3 {
   align-items: baseline;
 }
 
+.viz-tabs {
+  margin-top: 0.7rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.viz-tabs button {
+  border: 1px solid #cec4b5;
+  background: #f8f3e9;
+  color: #344154;
+  border-radius: 999px;
+  padding: 0.28rem 0.62rem;
+  font: inherit;
+  font-size: 0.81rem;
+  cursor: pointer;
+}
+
+.viz-tabs button.active {
+  background: var(--brand);
+  color: white;
+  border-color: var(--brand);
+}
+
+.viz-card {
+  margin-top: 0.8rem;
+  border: 1px solid #dfd6c8;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  padding: 0.78rem;
+}
+
 .map-layout {
   margin-top: 0.72rem;
   display: grid;
@@ -555,6 +587,157 @@ h3 {
   display: inline-block;
 }
 
+.cost-bars {
+  margin-top: 0.55rem;
+  display: grid;
+  gap: 0.44rem;
+  max-height: 460px;
+  overflow: auto;
+}
+
+.cost-row {
+  width: 100%;
+  border: 1px solid #e4dacd;
+  border-radius: 10px;
+  background: #fbf8f2;
+  padding: 0.35rem 0.45rem;
+  display: grid;
+  grid-template-columns: minmax(160px, 1.2fr) minmax(140px, 2fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cost-name {
+  font-size: 0.83rem;
+  color: #1d2c40;
+}
+
+.cost-track {
+  height: 8px;
+  border-radius: 999px;
+  background: #efe5d8;
+  overflow: hidden;
+}
+
+.cost-track i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #d89a64 0%, #c4603d 100%);
+}
+
+.cost-value {
+  font-size: 0.8rem;
+  color: #314057;
+  font-weight: 700;
+}
+
+.setting-grid {
+  margin-top: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.setting-card {
+  border: 1px solid #e2d8ca;
+  border-radius: 10px;
+  background: #fbf8f1;
+  padding: 0.52rem;
+}
+
+.setting-top {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.setting-top .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.setting-top b {
+  margin-left: auto;
+  border: 1px solid #d7cdbf;
+  border-radius: 999px;
+  padding: 0.1rem 0.46rem;
+  font-size: 0.78rem;
+}
+
+.major-insights {
+  margin-top: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.major-insight-card {
+  border: 1px solid #e2d8ca;
+  border-radius: 10px;
+  background: #fbf8f1;
+  padding: 0.52rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.major-insight-card strong {
+  font-size: 0.88rem;
+}
+
+.major-insight-card span {
+  font-size: 0.78rem;
+  color: #4f5a70;
+}
+
+.value-plot {
+  position: relative;
+  height: 380px;
+  margin-top: 0.6rem;
+  border: 1px solid #ddd3c5;
+  border-radius: 10px;
+  background:
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px) 0 0 / 20% 100%,
+    linear-gradient(to top, rgba(0, 0, 0, 0.05) 1px, transparent 1px) 0 0 / 100% 20%,
+    #fbfaf7;
+}
+
+.plot-dot {
+  position: absolute;
+  transform: translate(-50%, 50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+.plot-dot.active {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px #1f2f46;
+}
+
+.plot-axis {
+  margin-top: 0.35rem;
+  display: flex;
+  justify-content: space-between;
+  color: #56627a;
+  font-size: 0.78rem;
+}
+
+.inline-info-card {
+  margin-top: 0.7rem;
+  border: 1px solid #d8cec0;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.7rem;
+  box-shadow: 0 8px 18px rgba(20, 24, 38, 0.1);
+}
+
 .compare-drawer {
   position: fixed;
   inset: 0;
@@ -688,8 +871,15 @@ h3 {
   .grid,
   .stats,
   .map-info-grid,
-  .detail-grid {
+  .detail-grid,
+  .setting-grid,
+  .major-insights {
     grid-template-columns: 1fr;
+  }
+
+  .cost-row {
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
   }
 
   .compare-panel {

@@ -173,7 +173,7 @@ export default function CollegeExplorer({ colleges, fetchedAt, rankingSource }: 
           <section className="cards-header">
             <h2>Explore Colleges</h2>
             <button type="button" className="ghost" onClick={() => setMapExpanded((value) => !value)}>
-              {mapExpanded ? "Hide map" : "Show map"}
+              {mapExpanded ? "Hide visualizer" : "Show visualizer"}
             </button>
           </section>
 
