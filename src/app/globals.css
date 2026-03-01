@@ -704,6 +704,70 @@ h3 {
     #fbfaf7;
 }
 
+.value-layout {
+  margin-top: 0.45rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 0.7rem;
+}
+
+.value-scale-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: #56627a;
+}
+
+.plot-midline-x,
+.plot-midline-y {
+  position: absolute;
+  background: rgba(33, 45, 62, 0.15);
+}
+
+.plot-midline-x {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+}
+
+.plot-midline-y {
+  bottom: 0;
+  top: 0;
+  left: 50%;
+  width: 1px;
+}
+
+.plot-quadrant {
+  position: absolute;
+  font-size: 0.68rem;
+  color: #5a667d;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #e2d8cb;
+  border-radius: 999px;
+  padding: 0.05rem 0.35rem;
+}
+
+.plot-quadrant.q1 {
+  left: 2%;
+  top: 2%;
+}
+
+.plot-quadrant.q2 {
+  right: 2%;
+  top: 2%;
+}
+
+.plot-quadrant.q3 {
+  left: 2%;
+  bottom: 2%;
+}
+
+.plot-quadrant.q4 {
+  right: 2%;
+  bottom: 2%;
+}
+
 .plot-dot {
   position: absolute;
   transform: translate(-50%, 50%);
@@ -727,6 +791,56 @@ h3 {
   justify-content: space-between;
   color: #56627a;
   font-size: 0.78rem;
+}
+
+.value-list {
+  border: 1px solid #ddd3c5;
+  border-radius: 10px;
+  background: #fcf9f3;
+  max-height: 422px;
+  overflow: auto;
+  padding: 0.4rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.value-list-row {
+  width: 100%;
+  border: 1px solid #e4dacd;
+  border-radius: 9px;
+  background: #fff;
+  padding: 0.45rem;
+  display: grid;
+  gap: 0.25rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.value-list-row.active {
+  border-color: #8eb0dc;
+  background: #eef4ff;
+}
+
+.value-list-row b {
+  font-size: 0.83rem;
+}
+
+.value-list-row p {
+  margin: 0.15rem 0 0;
+  font-size: 0.74rem;
+  color: #59647b;
+}
+
+.value-list-row span {
+  display: block;
+  font-size: 0.74rem;
+  color: #36445d;
+}
+
+.value-list-row .value-rank {
+  margin-top: 0.12rem;
+  font-weight: 700;
+  color: #163859;
 }
 
 .inline-info-card {
@@ -874,6 +988,10 @@ h3 {
   .detail-grid,
   .setting-grid,
   .major-insights {
+    grid-template-columns: 1fr;
+  }
+
+  .value-layout {
     grid-template-columns: 1fr;
   }
 

@@ -160,6 +160,29 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
     };
   }, [valueItems]);
 
+  const valuePoints = useMemo(() => {
+    return valueItems.map((item) => {
+      const cost = item.costOfAttendance as number;
+      const earnings = item.medianEarnings10y as number;
+      const x =
+        valueBounds.maxCost === valueBounds.minCost
+          ? 50
+          : ((cost - valueBounds.minCost) / (valueBounds.maxCost - valueBounds.minCost)) * 100;
+      const y =
+        valueBounds.maxEarnings === valueBounds.minEarnings
+          ? 50
+          : ((earnings - valueBounds.minEarnings) / (valueBounds.maxEarnings - valueBounds.minEarnings)) * 100;
+      const valueScore = (1 - x / 100) * 0.5 + (y / 100) * 0.5;
+
+      return { ...item, x, y, valueScore };
+    });
+  }, [valueBounds.maxCost, valueBounds.maxEarnings, valueBounds.minCost, valueBounds.minEarnings, valueItems]);
+
+  const rankedValuePoints = useMemo(
+    () => [...valuePoints].sort((a, b) => b.valueScore - a.valueScore || a.rank - b.rank),
+    [valuePoints]
+  );
+
   if (!mapItems.length) {
     return (
       <section className="map-shell">
@@ -326,38 +349,63 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
       {view === "value" && (
         <div className="viz-card">
           <h3>Value Scatter: Cost vs Earnings</h3>
-          <p className="meta">Left is lower cost. Higher is stronger 10-year earnings.</p>
-          <div className="value-plot">
-            {valueItems.map((item) => {
-              const x =
-                valueBounds.maxCost === valueBounds.minCost
-                  ? 50
-                  : (((item.costOfAttendance as number) - valueBounds.minCost) /
-                      (valueBounds.maxCost - valueBounds.minCost)) *
-                    100;
-              const y =
-                valueBounds.maxEarnings === valueBounds.minEarnings
-                  ? 50
-                  : (((item.medianEarnings10y as number) - valueBounds.minEarnings) /
-                      (valueBounds.maxEarnings - valueBounds.minEarnings)) *
-                    100;
+          <p className="meta">X-axis is annual cost of attendance. Y-axis is median earnings 10 years after entry.</p>
 
-              return (
+          <div className="value-layout">
+            <div>
+              <div className="value-scale-row">
+                <span>Cost: {formatMoney(Math.round(valueBounds.minCost))}</span>
+                <span>Cost: {formatMoney(Math.round(valueBounds.maxCost))}</span>
+              </div>
+              <div className="value-plot">
+                <div className="plot-midline-x" />
+                <div className="plot-midline-y" />
+                <span className="plot-quadrant q1">High earnings, low cost</span>
+                <span className="plot-quadrant q2">High earnings, high cost</span>
+                <span className="plot-quadrant q3">Lower earnings, low cost</span>
+                <span className="plot-quadrant q4">Lower earnings, high cost</span>
+                {valuePoints.map((item) => (
+                  <button
+                    key={item.slug}
+                    type="button"
+                    className={`plot-dot ${selectedSlug === item.slug ? "active" : ""}`}
+                    style={{ left: `${item.x}%`, bottom: `${item.y}%`, background: item.markerColor }}
+                    onClick={() => setSelectedSlug(item.slug)}
+                    aria-label={`Select ${item.name}`}
+                    title={`#${item.rank} ${item.name} | Cost ${formatMoney(item.costOfAttendance)} | Earnings ${formatMoney(item.medianEarnings10y)}`}
+                  />
+                ))}
+              </div>
+              <div className="value-scale-row">
+                <span>Earnings: {formatMoney(Math.round(valueBounds.minEarnings))}</span>
+                <span>Earnings: {formatMoney(Math.round(valueBounds.maxEarnings))}</span>
+              </div>
+              <div className="plot-axis">
+                <span>X-axis: Lower cost → Higher cost</span>
+                <span>Y-axis: Lower earnings → Higher earnings</span>
+              </div>
+            </div>
+
+            <aside className="value-list" aria-label="Value chart college list">
+              {rankedValuePoints.map((item, index) => (
                 <button
                   key={item.slug}
                   type="button"
-                  className={`plot-dot ${selectedSlug === item.slug ? "active" : ""}`}
-                  style={{ left: `${x}%`, bottom: `${y}%`, background: item.markerColor }}
+                  className={`value-list-row ${selectedSlug === item.slug ? "active" : ""}`}
                   onClick={() => setSelectedSlug(item.slug)}
-                  aria-label={`Select ${item.name}`}
-                />
-              );
-            })}
-          </div>
-
-          <div className="plot-axis">
-            <span>Lower cost</span>
-            <span>Higher earnings</span>
+                >
+                  <div>
+                    <b>#{item.rank} {item.name}</b>
+                    <p>{item.settingLabel}</p>
+                  </div>
+                  <div>
+                    <span>Cost {formatMoney(item.costOfAttendance)}</span>
+                    <span>Earnings {formatMoney(item.medianEarnings10y)}</span>
+                    <span className="value-rank">Value rank {index + 1}</span>
+                  </div>
+                </button>
+              ))}
+            </aside>
           </div>
 
           {selected && (
