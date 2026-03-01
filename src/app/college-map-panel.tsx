@@ -116,6 +116,26 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
       .filter((row) => row.count > 0);
   }, [mapItems]);
 
+  const settingTakeaways = useMemo(() => {
+    if (!settingStats.length) {
+      return {
+        mostCommon: null,
+        lowestCost: null,
+        highestEarnings: null
+      };
+    }
+
+    const mostCommon = [...settingStats].sort((a, b) => b.count - a.count)[0];
+    const lowestCost = settingStats
+      .filter((row) => typeof row.avgCost === "number")
+      .sort((a, b) => (a.avgCost as number) - (b.avgCost as number))[0] ?? null;
+    const highestEarnings = settingStats
+      .filter((row) => typeof row.avgEarnings === "number")
+      .sort((a, b) => (b.avgEarnings as number) - (a.avgEarnings as number))[0] ?? null;
+
+    return { mostCommon, lowestCost, highestEarnings };
+  }, [settingStats]);
+
   const majorStats = useMemo(() => {
     const rollup = new Map<string, { key: string; label: string; shareTotal: number; count: number }>();
 
@@ -141,6 +161,22 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
       .sort((a, b) => b.count - a.count || b.avgShare - a.avgShare)
       .slice(0, 12);
   }, [mapItems]);
+
+  const majorTakeaways = useMemo(() => {
+    if (!majorStats.length) {
+      return {
+        mostCommon: null,
+        highestShare: null,
+        coverageSchools: 0
+      };
+    }
+
+    const mostCommon = [...majorStats].sort((a, b) => b.count - a.count)[0];
+    const highestShare = [...majorStats].sort((a, b) => b.avgShare - a.avgShare)[0];
+    const coverageSchools = mapItems.filter((item) => item.topMajors.length > 0).length;
+
+    return { mostCommon, highestShare, coverageSchools };
+  }, [majorStats, mapItems]);
 
   const valueItems = useMemo(() => {
     return mapItems.filter(
@@ -313,17 +349,50 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
       {view === "setting" && (
         <div className="viz-card">
           <h3>Setting Mix</h3>
-          <p className="meta">Counts plus average cost and outcomes by campus setting.</p>
-          <div className="setting-grid">
+          <p className="meta">Visual breakdown of where schools are located, and how cost/outcomes shift by setting.</p>
+
+          <div className="setting-takeaways">
+            {settingTakeaways.mostCommon && (
+              <article className="takeaway-card">
+                <b>Most common setting</b>
+                <span>
+                  {settingTakeaways.mostCommon.label} ({settingTakeaways.mostCommon.count} schools)
+                </span>
+              </article>
+            )}
+            {settingTakeaways.lowestCost && (
+              <article className="takeaway-card">
+                <b>Lowest average cost</b>
+                <span>
+                  {settingTakeaways.lowestCost.label} ({formatMoney(Math.round(settingTakeaways.lowestCost.avgCost as number))})
+                </span>
+              </article>
+            )}
+            {settingTakeaways.highestEarnings && (
+              <article className="takeaway-card">
+                <b>Highest average 10y earnings</b>
+                <span>
+                  {settingTakeaways.highestEarnings.label} ({formatMoney(Math.round(settingTakeaways.highestEarnings.avgEarnings as number))})
+                </span>
+              </article>
+            )}
+          </div>
+
+          <div className="setting-bars">
             {settingStats.map((row) => (
-              <article key={row.setting} className="setting-card">
+              <article key={row.setting} className="setting-bar-row">
                 <div className="setting-top">
                   <span className="dot" style={{ background: row.color }} />
                   <strong>{row.label}</strong>
-                  <b>{row.count}</b>
+                  <b>{row.count} schools</b>
                 </div>
-                <p className="meta">Avg cost: {formatMoney(row.avgCost ? Math.round(row.avgCost) : null)}</p>
-                <p className="meta">Avg 10y earnings: {formatMoney(row.avgEarnings ? Math.round(row.avgEarnings) : null)}</p>
+                <div className="setting-track">
+                  <i style={{ width: `${((row.count / Math.max(mapItems.length, 1)) * 100).toFixed(2)}%`, background: row.color }} />
+                </div>
+                <div className="setting-metrics">
+                  <span>Avg cost {formatMoney(row.avgCost ? Math.round(row.avgCost) : null)}</span>
+                  <span>Avg earnings {formatMoney(row.avgEarnings ? Math.round(row.avgEarnings) : null)}</span>
+                </div>
               </article>
             ))}
           </div>
@@ -333,13 +402,42 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
       {view === "majors" && (
         <div className="viz-card">
           <h3>Areas of Focus</h3>
-          <p className="meta">Most common strong program areas across visible colleges.</p>
-          <div className="major-insights">
+          <p className="meta">Major strengths visualized by prevalence and average intensity.</p>
+
+          <div className="setting-takeaways">
+            {majorTakeaways.mostCommon && (
+              <article className="takeaway-card">
+                <b>Most prevalent</b>
+                <span>
+                  {majorTakeaways.mostCommon.label} ({majorTakeaways.mostCommon.count} schools)
+                </span>
+              </article>
+            )}
+            {majorTakeaways.highestShare && (
+              <article className="takeaway-card">
+                <b>Highest average intensity</b>
+                <span>
+                  {majorTakeaways.highestShare.label} ({formatMajorShare(majorTakeaways.highestShare.avgShare)})
+                </span>
+              </article>
+            )}
+            <article className="takeaway-card">
+              <b>Schools with major data</b>
+              <span>{majorTakeaways.coverageSchools} of {mapItems.length}</span>
+            </article>
+          </div>
+
+          <div className="major-bars">
             {majorStats.map((major) => (
-              <article key={major.key} className="major-insight-card">
-                <strong>{major.label}</strong>
-                <span>{major.count} schools</span>
-                <span>Avg share {formatMajorShare(major.avgShare)}</span>
+              <article key={major.key} className="major-bar-row">
+                <div className="major-label-row">
+                  <strong>{major.label}</strong>
+                  <span>{major.count} schools</span>
+                </div>
+                <div className="major-track">
+                  <i style={{ width: `${((major.count / Math.max(mapItems.length, 1)) * 100).toFixed(2)}%` }} />
+                </div>
+                <p className="meta">Avg share {formatMajorShare(major.avgShare)}</p>
               </article>
             ))}
           </div>

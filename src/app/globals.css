@@ -640,6 +640,46 @@ h3 {
   gap: 0.55rem;
 }
 
+.setting-takeaways {
+  margin-top: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.takeaway-card {
+  border: 1px solid #dfd5c7;
+  border-radius: 10px;
+  background: #fbf6ee;
+  padding: 0.5rem;
+  display: grid;
+  gap: 0.16rem;
+}
+
+.takeaway-card b {
+  font-size: 0.78rem;
+  color: #3f4c64;
+}
+
+.takeaway-card span {
+  font-size: 0.86rem;
+  color: #202f45;
+  font-weight: 700;
+}
+
+.setting-bars {
+  margin-top: 0.65rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.setting-bar-row {
+  border: 1px solid #e2d8ca;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.48rem;
+}
+
 .setting-card {
   border: 1px solid #e2d8ca;
   border-radius: 10px;
@@ -665,6 +705,74 @@ h3 {
   border-radius: 999px;
   padding: 0.1rem 0.46rem;
   font-size: 0.78rem;
+}
+
+.setting-track {
+  margin-top: 0.36rem;
+  height: 8px;
+  border-radius: 999px;
+  background: #ede3d7;
+  overflow: hidden;
+}
+
+.setting-track i {
+  display: block;
+  height: 100%;
+}
+
+.setting-metrics {
+  margin-top: 0.34rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.setting-metrics span {
+  font-size: 0.76rem;
+  color: #4a5870;
+}
+
+.major-bars {
+  margin-top: 0.65rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.major-bar-row {
+  border: 1px solid #e2d8ca;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.5rem;
+}
+
+.major-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.major-label-row strong {
+  font-size: 0.88rem;
+}
+
+.major-label-row span {
+  font-size: 0.76rem;
+  color: #57637a;
+}
+
+.major-track {
+  margin-top: 0.32rem;
+  height: 8px;
+  border-radius: 999px;
+  background: #e5dcca;
+  overflow: hidden;
+}
+
+.major-track i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #2d8895 0%, #1a5f78 100%);
 }
 
 .major-insights {
@@ -1033,7 +1141,8 @@ h3 {
   .map-info-grid,
   .detail-grid,
   .setting-grid,
-  .major-insights {
+  .major-insights,
+  .setting-takeaways {
     grid-template-columns: 1fr;
   }
 
