@@ -352,38 +352,41 @@ export default function CollegeMapPanel({ colleges, shortlistSlugs }: Props) {
           <p className="meta">X-axis is annual cost of attendance. Y-axis is median earnings 10 years after entry.</p>
 
           <div className="value-layout">
-            <div>
-              <div className="value-scale-row">
-                <span>Cost: {formatMoney(Math.round(valueBounds.minCost))}</span>
-                <span>Cost: {formatMoney(Math.round(valueBounds.maxCost))}</span>
+            <div className="value-chart">
+              <div className="value-plot-with-y">
+                <div className="value-y-axis">
+                  <span className="value-y-max">Higher earnings: {formatMoney(Math.round(valueBounds.maxEarnings))}</span>
+                  <span className="value-y-title">10y earnings</span>
+                  <span className="value-y-min">Lower earnings: {formatMoney(Math.round(valueBounds.minEarnings))}</span>
+                </div>
+
+                <div className="value-plot">
+                  <div className="plot-midline-x" />
+                  <div className="plot-midline-y" />
+                  <span className="plot-quadrant q1">High earnings, low cost</span>
+                  <span className="plot-quadrant q2">High earnings, high cost</span>
+                  <span className="plot-quadrant q3">Lower earnings, low cost</span>
+                  <span className="plot-quadrant q4">Lower earnings, high cost</span>
+                  {valuePoints.map((item) => (
+                    <button
+                      key={item.slug}
+                      type="button"
+                      className={`plot-dot ${selectedSlug === item.slug ? "active" : ""}`}
+                      style={{ left: `${item.x}%`, bottom: `${item.y}%`, background: item.markerColor }}
+                      onClick={() => setSelectedSlug(item.slug)}
+                      aria-label={`Select ${item.name}`}
+                      title={`#${item.rank} ${item.name} | Cost ${formatMoney(item.costOfAttendance)} | Earnings ${formatMoney(item.medianEarnings10y)}`}
+                    />
+                  ))}
+                </div>
               </div>
-              <div className="value-plot">
-                <div className="plot-midline-x" />
-                <div className="plot-midline-y" />
-                <span className="plot-quadrant q1">High earnings, low cost</span>
-                <span className="plot-quadrant q2">High earnings, high cost</span>
-                <span className="plot-quadrant q3">Lower earnings, low cost</span>
-                <span className="plot-quadrant q4">Lower earnings, high cost</span>
-                {valuePoints.map((item) => (
-                  <button
-                    key={item.slug}
-                    type="button"
-                    className={`plot-dot ${selectedSlug === item.slug ? "active" : ""}`}
-                    style={{ left: `${item.x}%`, bottom: `${item.y}%`, background: item.markerColor }}
-                    onClick={() => setSelectedSlug(item.slug)}
-                    aria-label={`Select ${item.name}`}
-                    title={`#${item.rank} ${item.name} | Cost ${formatMoney(item.costOfAttendance)} | Earnings ${formatMoney(item.medianEarnings10y)}`}
-                  />
-                ))}
+
+              <div className="value-x-scale">
+                <span>Lower cost: {formatMoney(Math.round(valueBounds.minCost))}</span>
+                <span>Higher cost: {formatMoney(Math.round(valueBounds.maxCost))}</span>
               </div>
-              <div className="value-scale-row">
-                <span>Earnings: {formatMoney(Math.round(valueBounds.minEarnings))}</span>
-                <span>Earnings: {formatMoney(Math.round(valueBounds.maxEarnings))}</span>
-              </div>
-              <div className="plot-axis">
-                <span>X-axis: Lower cost → Higher cost</span>
-                <span>Y-axis: Lower earnings → Higher earnings</span>
-              </div>
+
+              <p className="value-x-title">Cost of attendance (annual)</p>
             </div>
 
             <aside className="value-list" aria-label="Value chart college list">

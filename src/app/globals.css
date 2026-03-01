@@ -711,11 +711,42 @@ h3 {
   gap: 0.7rem;
 }
 
-.value-scale-row {
-  display: flex;
-  justify-content: space-between;
+.value-chart {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.value-plot-with-y {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.value-y-axis {
+  border: 1px solid #ddd3c5;
+  border-radius: 10px;
+  background: #fcf8f1;
+  padding: 0.38rem;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 0.35rem;
+}
+
+.value-y-max,
+.value-y-min {
+  font-size: 0.72rem;
+  color: #4c586f;
+}
+
+.value-y-title {
+  justify-self: center;
+  align-self: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
   font-size: 0.78rem;
-  color: #56627a;
+  font-weight: 700;
+  color: #2d3d55;
 }
 
 .plot-midline-x,
@@ -785,8 +816,23 @@ h3 {
   box-shadow: 0 0 0 2px #1f2f46;
 }
 
+.value-x-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.77rem;
+  color: #56627a;
+}
+
+.value-x-title {
+  margin: 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: #425169;
+  font-weight: 700;
+}
+
 .plot-axis {
-  margin-top: 0.35rem;
+  margin-top: 0.1rem;
   display: flex;
   justify-content: space-between;
   color: #56627a;
@@ -993,6 +1039,20 @@ h3 {
 
   .value-layout {
     grid-template-columns: 1fr;
+  }
+
+  .value-plot-with-y {
+    grid-template-columns: 1fr;
+  }
+
+  .value-y-axis {
+    grid-template-rows: auto auto auto;
+  }
+
+  .value-y-title {
+    writing-mode: horizontal-tb;
+    transform: none;
+    justify-self: start;
   }
 
   .cost-row {
