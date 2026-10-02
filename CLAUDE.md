@@ -74,5 +74,9 @@ An AI-powered college intelligence tool for families, built with Next.js 15 on V
 
 ## Deploy
 - Vercel (connected to `amjadhu/college-explorer` repo)
+- Production URL: https://college-explorer-theta.vercel.app
 - Server actions enabled for AI briefing generation
 - Environment variables configured in Vercel dashboard
+- Turso DB: `college-compass` (libsql://college-compass-famshuss.aws-us-west-2.turso.io)
+- Data file (`data/top50-colleges.json`) is committed to repo — Vercel builds don't run the data pipeline
+- `drizzle.config.ts` uses dialect `"turso"` with `authToken` in dbCredentials
