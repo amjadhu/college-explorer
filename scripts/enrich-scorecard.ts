@@ -47,12 +47,26 @@ type ScorecardSchool = {
   [key: string]: unknown;
 };
 
+type EarningsYear = {
+  overall_median_earnings?: number | null;
+  [key: string]: unknown;
+};
+
 type ProgramEntry = {
   code: string;
   title: string;
   credential: { level: number };
-  earnings?: { median_earnings_ceeb?: { median_earnings?: number | null } };
-  debt?: { median_debt?: { all_students?: number | null } };
+  earnings?: {
+    "1_yr"?: EarningsYear;
+    "2_yr"?: EarningsYear;
+    "3_yr"?: EarningsYear;
+    "4_yr"?: EarningsYear;
+    [key: string]: unknown;
+  };
+  debt?: {
+    staff_grad_plus?: { all?: { eval_inst?: { median?: number | null } } };
+    [key: string]: unknown;
+  };
 };
 
 const endpoint = "https://api.data.gov/ed/collegescorecard/v1/schools";
@@ -108,21 +122,66 @@ export function extractProgramData(scorecard: ScorecardSchool | null): ProgramDa
   if (!Array.isArray(programs)) return [];
 
   return programs
-    .map((p: ProgramEntry) => ({
-      cipCode: p.code ?? "",
-      title: p.title ?? "",
-      credentialLevel: p.credential?.level ?? 0,
-      medianEarnings: p.earnings?.median_earnings_ceeb?.median_earnings ?? null,
-      medianDebt: p.debt?.median_debt?.all_students ?? null,
-    }))
+    .map((p: ProgramEntry) => {
+      // Use the most recent year with earnings data (prefer 1yr, then 2yr, etc.)
+      const earnings = p.earnings;
+      const medianEarnings =
+        earnings?.["1_yr"]?.overall_median_earnings ??
+        earnings?.["2_yr"]?.overall_median_earnings ??
+        earnings?.["3_yr"]?.overall_median_earnings ??
+        earnings?.["4_yr"]?.overall_median_earnings ??
+        null;
+
+      const medianDebt =
+        p.debt?.staff_grad_plus?.all?.eval_inst?.median ?? null;
+
+      return {
+        cipCode: p.code ?? "",
+        title: p.title ?? "",
+        credentialLevel: p.credential?.level ?? 0,
+        medianEarnings,
+        medianDebt,
+      };
+    })
     .filter((p) => p.cipCode.length >= 2);
 }
 
-async function fetchSchoolByName(apiKey: string, name: string): Promise<ScorecardSchool | null> {
+/** Hard overrides for schools whose US News names don't match Scorecard */
+/** Map US News name → exact Scorecard school name for known mismatches.
+ *  The search term (key in nameVariants) is tried first, then the override
+ *  value is used for exact matching against results. */
+const SCORECARD_EXACT_NAMES: Record<string, string> = {
+  "The Ohio State University": "Ohio State University-Main Campus",
+  "Columbia University": "Columbia University in the City of New York",
+  "University of Virginia": "University of Virginia-Main Campus",
+};
+
+/** Generate alternate name forms to try against the Scorecard API */
+function nameVariants(name: string): string[] {
+  const variants = [name];
+
+  // "University of California, Berkeley" → "University of California-Berkeley"
+  if (name.includes(", ")) {
+    variants.push(name.replace(/, /g, "-"));
+  }
+  // "The University of Texas--Austin" → "University of Texas at Austin"
+  if (name.startsWith("The ")) {
+    variants.push(name.slice(4));
+  }
+  if (name.includes("--")) {
+    variants.push(name.replace(/--/g, "-"));
+    variants.push(name.replace(/--/g, " at "));
+  }
+  // "The Ohio State University" → "Ohio State University-Main Campus"
+  const mainCampus = variants.map((v) => v + "-Main Campus");
+  return [...new Set([...variants, ...mainCampus])];
+}
+
+async function fetchOneVariant(apiKey: string, searchName: string, originalName: string): Promise<ScorecardSchool | null> {
   const params = new URLSearchParams();
   params.set("api_key", apiKey);
-  params.set("school.name", name);
-  params.set("_per_page", "8");
+  params.set("school.name", searchName);
+  params.set("_per_page", "25");
   params.set("fields", fields);
 
   for (let attempt = 1; attempt <= 3; attempt += 1) {
@@ -141,13 +200,30 @@ async function fetchSchoolByName(apiKey: string, name: string): Promise<Scorecar
 
     if (!results.length) return null;
 
+    // If we have an exact name override, look for it first
+    const exactTarget = SCORECARD_EXACT_NAMES[originalName];
+    if (exactTarget) {
+      const exactMatch = results.find(
+        (row) => row["school.name"].toLowerCase() === exactTarget.toLowerCase()
+      );
+      if (exactMatch) return exactMatch;
+    }
+
     const scored = results
-      .map((row) => ({ row, score: scoreName(name, row["school.name"]) }))
+      .map((row) => ({ row, score: scoreName(originalName, row["school.name"]) }))
       .sort((a, b) => b.score - a.score);
 
     return scored[0].score >= 40 ? scored[0].row : null;
   }
 
+  return null;
+}
+
+async function fetchSchoolByName(apiKey: string, name: string): Promise<ScorecardSchool | null> {
+  for (const variant of nameVariants(name)) {
+    const result = await fetchOneVariant(apiKey, variant, name);
+    if (result) return result;
+  }
   return null;
 }
 
@@ -183,7 +259,11 @@ async function main() {
   console.log(`Enriched ${found}/${rankingData.colleges.length} colleges using College Scorecard.`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+// Only run when executed directly, not when imported
+const isDirectRun = process.argv[1]?.includes("enrich-scorecard");
+if (isDirectRun) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

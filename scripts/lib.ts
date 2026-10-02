@@ -64,10 +64,13 @@ export const scoreName = (forbesName: string, scorecardName: string): number => 
   const left = normalizeName(forbesName);
   const right = normalizeName(scorecardName);
   if (left === right) return 95;
-  if (left.includes(right) || right.includes(left)) return 88;
 
-  const a = new Set(left.split(" "));
-  const b = new Set(right.split(" "));
-  const intersect = [...a].filter((t) => b.has(t)).length;
-  return Math.round((intersect / Math.max(a.size, b.size, 1)) * 80);
+  const a = left.split(" ").filter(Boolean);
+  const b = right.split(" ").filter(Boolean);
+  const setA = new Set(a);
+  const setB = new Set(b);
+  const intersect = [...setA].filter((t) => setB.has(t)).length;
+  // Jaccard-style: reward overlap, penalize extra tokens on either side
+  const union = new Set([...a, ...b]).size;
+  return Math.round((intersect / Math.max(union, 1)) * 90);
 };
