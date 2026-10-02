@@ -57,7 +57,7 @@ An AI-powered college intelligence tool for families, built with Next.js 15 on V
 - `npm run build` — Next.js build (server-rendered, not static export)
 - `npm run test:unit` — tests via Node test runner
 - `npm run typecheck` — tsc --noEmit
-- `npm run data:refresh` — full pipeline
+- `npm run data:refresh` — full pipeline (requires `COLLEGE_SCORECARD_API_KEY` env var, use `RANKING_SOURCE=usnews` prefix)
 - `npm run db:push` — push schema to database
 - `npm run db:generate` — generate migrations
 
@@ -74,7 +74,7 @@ An AI-powered college intelligence tool for families, built with Next.js 15 on V
 
 ## Deploy
 - Vercel (connected to `amjadhu/college-explorer` repo)
-- Production URL: https://college-explorer-theta.vercel.app
+- Production URL: https://colleges.amjadhu.com (also https://college-explorer-theta.vercel.app)
 - Server actions enabled for AI briefing generation
 - Environment variables configured in Vercel dashboard
 - Turso DB: `college-compass` (libsql://college-compass-famshuss.aws-us-west-2.turso.io)
