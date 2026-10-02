@@ -53,7 +53,7 @@ export default function RadarChart({ scores, label, size = 240, color = "#1c5560
   return (
     <div className="radar-chart">
       <div>
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <svg width="100%" viewBox={`0 0 ${size} ${size}`} style={{ maxWidth: size }}>
           {/* Grid rings */}
           {rings.map((r) => (
             <polygon

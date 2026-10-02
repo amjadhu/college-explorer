@@ -1,7 +1,7 @@
 "use server";
 
 import { db, schema } from "@/lib/db/client";
-import { eq, sql, desc, inArray } from "drizzle-orm";
+import { eq, sql, desc, inArray, gte, lt, and } from "drizzle-orm";
 import type { CollegeBriefingData } from "./briefing";
 
 export type StoredBriefing = {
@@ -33,11 +33,19 @@ export async function getBriefing(slug: string): Promise<StoredBriefing | null> 
 }
 
 export async function getBriefingsRemaining(): Promise<number> {
-  const today = new Date().toISOString().slice(0, 10);
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const tomorrowStart = new Date(todayStart);
+  tomorrowStart.setDate(tomorrowStart.getDate() + 1);
   const countResult = await db
     .select({ count: sql<number>`count(*)` })
     .from(schema.collegeBriefings)
-    .where(sql`${schema.collegeBriefings.generatedAt} LIKE ${today + "%"}`);
+    .where(
+      and(
+        gte(schema.collegeBriefings.generatedAt, todayStart.toISOString()),
+        lt(schema.collegeBriefings.generatedAt, tomorrowStart.toISOString())
+      )
+    );
 
   const todayCount = countResult[0]?.count ?? 0;
   return Math.max(0, 20 - todayCount);

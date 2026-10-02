@@ -21,7 +21,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@libsql/client": "^0.14.0",
-    "drizzle-orm": "^0.38.0",
+    "drizzle-orm": "^0.45.3",
     "leaflet": "1.9.4",
     "next": "^15.5.27",
     "react": "19.0.0",
@@ -36,7 +36,7 @@
     "@types/react-dom": "19.0.4",
     "@types/uuid": "^10.0.0",
     "cheerio": "1.0.0",
-    "drizzle-kit": "^0.30.0",
+    "drizzle-kit": "^0.31.11",
     "eslint": "9.21.0",
     "eslint-config-next": "15.1.7",
     "tsx": "4.20.5",

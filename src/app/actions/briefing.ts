@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import Anthropic from "@anthropic-ai/sdk";
 import { db, schema } from "@/lib/db/client";
 import { readColleges } from "@/lib/data";
-import { eq, sql } from "drizzle-orm";
+import { eq, gte, lt, and, sql } from "drizzle-orm";
 import type { CollegeRecord, FamilyPreferences } from "@/lib/types";
 import { formatMoney, formatPercent } from "@/lib/format";
 
@@ -106,17 +106,48 @@ export async function generateCollegeBriefing(
   slug: string,
   preferences: FamilyPreferences | null
 ): Promise<{ success: boolean; error?: string }> {
+  // Input validation
+  if (typeof slug !== "string" || slug.length >= 100 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+    return { success: false, error: "Invalid college slug" };
+  }
+
+  if (preferences !== null) {
+    if (typeof preferences !== "object") {
+      return { success: false, error: "Invalid preferences" };
+    }
+    if (preferences.weights && typeof preferences.weights === "object") {
+      for (const v of Object.values(preferences.weights)) {
+        if (typeof v !== "number" || v < 0 || v > 100) {
+          return { success: false, error: "Preference weights must be numbers 0-100" };
+        }
+      }
+    }
+    if (preferences.interests !== undefined) {
+      if (!Array.isArray(preferences.interests) || !preferences.interests.every((i) => typeof i === "string")) {
+        return { success: false, error: "Interests must be a string array" };
+      }
+    }
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return { success: false, error: "ANTHROPIC_API_KEY is not configured" };
   }
 
-  // Rate limit check
-  const today = new Date().toISOString().slice(0, 10);
+  // Rate limit check using proper date range
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const tomorrowStart = new Date(todayStart);
+  tomorrowStart.setDate(tomorrowStart.getDate() + 1);
   const countResult = await db
     .select({ count: sql<number>`count(*)` })
     .from(schema.collegeBriefings)
-    .where(sql`${schema.collegeBriefings.generatedAt} LIKE ${today + "%"}`);
+    .where(
+      and(
+        gte(schema.collegeBriefings.generatedAt, todayStart.toISOString()),
+        lt(schema.collegeBriefings.generatedAt, tomorrowStart.toISOString())
+      )
+    );
 
   const todayCount = countResult[0]?.count ?? 0;
   if (todayCount >= DAILY_LIMIT) {
@@ -158,7 +189,12 @@ export async function generateCollegeBriefing(
     }
 
     const jsonStr = text.slice(firstBrace, lastBrace + 1);
-    const briefingData = JSON.parse(jsonStr) as CollegeBriefingData;
+    let briefingData: CollegeBriefingData;
+    try {
+      briefingData = JSON.parse(jsonStr) as CollegeBriefingData;
+    } catch {
+      return { success: false, error: "AI response contained malformed JSON" };
+    }
 
     // Validate required fields
     if (!briefingData.verdict || !briefingData.oneLiner) {
