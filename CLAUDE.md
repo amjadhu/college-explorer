@@ -72,6 +72,21 @@ An AI-powered college intelligence tool for families, built with Next.js 15 on V
 - Colors: `--brand: #1c5560` (teal), `--accent: #c5663f` (coral), `--bg: #f2ede5` (warm beige)
 - All CSS in `globals.css` — no CSS modules or Tailwind
 
+## Security
+- HTTP security headers configured in `next.config.ts` (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, X-DNS-Prefetch-Control, HSTS)
+- No CSP header — Leaflet and inline canvas scripts would need careful whitelisting
+- Server action input validation in `briefing.ts`: slug regex, preferences weights/interests type checks
+- Rate-limit queries use proper `gte`/`lt` date ranges (not `LIKE` string concatenation)
+- `JSON.parse` of AI output wrapped in try-catch
+- `.env.local` should only contain `COLLEGE_SCORECARD_API_KEY` (no Vercel OIDC tokens)
+
+## Responsive Design
+- Breakpoints: 1080px (sidebar collapses), 980px (grids stack), 640px (mobile)
+- All interactive elements get 44px min-height touch targets at ≤640px
+- Radar chart SVG uses `width="100%"` + `viewBox` for responsive scaling
+- Viz tabs horizontally scroll (not wrap) on mobile
+- Two `@media` blocks in `globals.css` — do not duplicate (previously had duplicate 980px and 640px blocks)
+
 ## Deploy
 - Vercel (connected to `amjadhu/college-explorer` repo)
 - Production URL: https://colleges.amjadhu.com (also https://college-explorer-theta.vercel.app)
