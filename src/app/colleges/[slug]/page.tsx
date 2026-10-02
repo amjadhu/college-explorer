@@ -2,19 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ShortlistButton from "@/app/shortlist-button";
 import SchoolBriefing from "@/app/school-briefing";
+import CollegeBriefing from "@/app/college-briefing";
 import { getCollegeBySlug, readColleges } from "@/lib/data";
+import { getBriefing, getBriefingsRemaining } from "@/app/actions/briefing-helpers";
 import { formatMajorShare, formatMoney, formatPercent, ownershipLabel, formatSATRange, formatRatio } from "@/lib/format";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
-
-export const dynamicParams = false;
-
-export async function generateStaticParams() {
-  const colleges = await readColleges();
-  return colleges.map((college) => ({ slug: college.slug }));
-}
 
 export default async function CollegePage({ params }: Props) {
   const { slug } = await params;
@@ -23,11 +18,28 @@ export default async function CollegePage({ params }: Props) {
 
   if (!college) return notFound();
 
+  // Fetch existing AI briefing and remaining count
+  let briefing = null;
+  let remaining = 20;
+  try {
+    [briefing, remaining] = await Promise.all([
+      getBriefing(slug),
+      getBriefingsRemaining(),
+    ]);
+  } catch {
+    // DB not available (local dev without Turso) — gracefully continue
+  }
+
   const website = college.website
     ? college.website.startsWith("http")
       ? college.website
       : `https://${college.website}`
     : null;
+
+  // Program earnings for matched interests
+  const programsWithEarnings = college.allMajors.filter(
+    (m) => m.medianEarnings != null || m.medianDebt != null
+  );
 
   return (
     <main>
@@ -56,8 +68,49 @@ export default async function CollegePage({ params }: Props) {
         </div>
       </section>
 
-      {/* Narrative briefing (client component) */}
+      {/* AI Briefing - primary intelligence section */}
+      <CollegeBriefing
+        slug={slug}
+        initialBriefing={briefing ? {
+          briefingData: briefing.briefingData,
+          generatedAt: briefing.generatedAt,
+          model: briefing.model,
+        } : null}
+        initialRemaining={remaining}
+      />
+
+      {/* Deterministic narrative briefing (client component) - supporting analysis */}
       <SchoolBriefing college={college} allColleges={allColleges} />
+
+      {/* Program-level earnings/debt table */}
+      {programsWithEarnings.length > 0 && (
+        <section className="detail">
+          <h2>Program-Level Earnings & Debt</h2>
+          <p className="meta" style={{ marginBottom: "0.5rem" }}>
+            Median earnings and debt by field of study at this school
+          </p>
+          <div className="program-earnings-grid">
+            {programsWithEarnings.map((major) => (
+              <div className="program-earnings-row" key={major.key}>
+                <span className="program-name">{major.label}</span>
+                <span className="program-share">{formatMajorShare(major.share)}</span>
+                <span className="program-earn">
+                  {major.medianEarnings != null ? formatMoney(major.medianEarnings) : "—"}
+                </span>
+                <span className="program-debt">
+                  {major.medianDebt != null ? formatMoney(major.medianDebt) : "—"}
+                </span>
+              </div>
+            ))}
+            <div className="program-earnings-row program-earnings-header">
+              <span className="program-name"><b>Program</b></span>
+              <span className="program-share"><b>Enrollment</b></span>
+              <span className="program-earn"><b>Earnings</b></span>
+              <span className="program-debt"><b>Debt</b></span>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Traditional stats sections */}
       <section className="detail">

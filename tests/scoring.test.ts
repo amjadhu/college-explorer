@@ -42,14 +42,14 @@ test("program strength dimension responds to interest selection", () => {
     makeCollege({
       slug: "eng-school",
       allMajors: [
-        { key: "engineering", label: "Engineering", share: 0.4 },
-        { key: "computer", label: "Computer Science", share: 0.2 },
+        { key: "engineering", label: "Engineering", share: 0.4, medianEarnings: null, medianDebt: null },
+        { key: "computer", label: "Computer Science", share: 0.2, medianEarnings: null, medianDebt: null },
       ]
     }),
     makeCollege({
       slug: "art-school",
       allMajors: [
-        { key: "visual_performing", label: "Visual & Performing Arts", share: 0.5 },
+        { key: "visual_performing", label: "Visual & Performing Arts", share: 0.5, medianEarnings: null, medianDebt: null },
       ]
     }),
   ];

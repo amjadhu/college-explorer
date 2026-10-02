@@ -12,3 +12,6 @@
 /data/raw/forbes-top50.json
 /data/raw/ranking-top50.json
 /data/raw/scorecard-enriched.json
+local.db
+*.tsbuildinfo
+/drizzle/

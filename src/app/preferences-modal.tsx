@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import type { DimensionKey, FamilyPreferences } from "@/lib/types";
-import { dimensionLabels } from "@/lib/scoring";
 import { programFields } from "../../scripts/majors";
 
 type Props = {
@@ -12,36 +11,84 @@ type Props = {
   onClose: () => void;
 };
 
-const dimensionDescriptions: Record<DimensionKey, string> = {
-  academicRigor: "Selectivity, test scores, retention, and graduation rates",
-  careerOutcomes: "Post-graduation earnings and employment success",
-  financialValue: "Net cost, aid availability, and debt levels",
-  safetyWellbeing: "Campus safety, student support, and wellbeing",
-  campusLifeCulture: "Campus size, class sizes, and student engagement",
-  locationEnvironment: "Distance from home and campus setting",
-  programStrength: "Strength in your areas of academic interest",
-};
+type PriorityKey = "costValue" | "careerOutcomes" | "academicPrestige";
+
+const priorities: { key: PriorityKey; label: string; description: string }[] = [
+  { key: "costValue", label: "Cost & Value", description: "Affordable net price, low debt, strong financial aid" },
+  { key: "careerOutcomes", label: "Career Outcomes", description: "High post-graduation earnings, strong programs in your interests" },
+  { key: "academicPrestige", label: "Academic Prestige", description: "Selectivity, test scores, graduation rates, academic rigor" },
+];
+
+function priorityToWeights(selected: Set<PriorityKey>): Record<DimensionKey, number> {
+  const weights: Record<DimensionKey, number> = {
+    academicRigor: 50,
+    careerOutcomes: 50,
+    financialValue: 50,
+    safetyWellbeing: 50,
+    campusLifeCulture: 50,
+    locationEnvironment: 50,
+    programStrength: 50,
+  };
+
+  if (selected.has("costValue")) {
+    weights.financialValue = 85;
+  }
+  if (selected.has("careerOutcomes")) {
+    weights.careerOutcomes = 85;
+    weights.programStrength = 75;
+  }
+  if (selected.has("academicPrestige")) {
+    weights.academicRigor = 85;
+  }
+
+  return weights;
+}
+
+function weightsToPriorities(weights: Record<DimensionKey, number>): Set<PriorityKey> {
+  const selected = new Set<PriorityKey>();
+  if (weights.financialValue > 60) selected.add("costValue");
+  if (weights.careerOutcomes > 60) selected.add("careerOutcomes");
+  if (weights.academicRigor > 60) selected.add("academicPrestige");
+  return selected;
+}
 
 export default function PreferencesModal({ open, preferences, onSave, onClose }: Props) {
-  const [draft, setDraft] = useState<FamilyPreferences>({ ...preferences, weights: { ...preferences.weights }, interests: [...preferences.interests] });
+  const [selectedPriorities, setSelectedPriorities] = useState<Set<PriorityKey>>(
+    () => weightsToPriorities(preferences.weights)
+  );
+  const [interests, setInterests] = useState<string[]>([...preferences.interests]);
+  const [homeLabel, setHomeLabel] = useState(preferences.homeLabel);
+  const [homeLatitude, setHomeLatitude] = useState(preferences.homeLatitude);
+  const [homeLongitude, setHomeLongitude] = useState(preferences.homeLongitude);
 
   if (!open) return null;
 
-  const setWeight = (key: DimensionKey, value: number) => {
-    setDraft((prev) => ({ ...prev, weights: { ...prev.weights, [key]: value } }));
-  };
-
-  const toggleInterest = (key: string) => {
-    setDraft((prev) => {
-      const interests = prev.interests.includes(key)
-        ? prev.interests.filter((k) => k !== key)
-        : [...prev.interests, key];
-      return { ...prev, interests };
+  const togglePriority = (key: PriorityKey) => {
+    setSelectedPriorities((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
     });
   };
 
+  const toggleInterest = (key: string) => {
+    setInterests((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
+
   const handleSave = () => {
-    onSave(draft);
+    onSave({
+      weights: priorityToWeights(selectedPriorities),
+      interests,
+      homeLabel,
+      homeLatitude,
+      homeLongitude,
+    });
     onClose();
   };
 
@@ -51,34 +98,27 @@ export default function PreferencesModal({ open, preferences, onSave, onClose }:
       <div className="prefs-panel" role="dialog" aria-modal="true">
         <div className="prefs-header">
           <div>
-            <h2>What Matters to Your Family</h2>
-            <p className="meta">Adjust these to personalize your school rankings</p>
+            <h2>Set Your Priorities</h2>
+            <p className="meta">What matters most to your family?</p>
           </div>
           <button type="button" className="ghost" onClick={onClose}>Close</button>
         </div>
 
         <div className="prefs-body">
           <section className="prefs-section">
-            <h3>Priority Dimensions</h3>
-            <p className="meta">Drag each slider to set how much this matters (0 = don&apos;t care, 100 = top priority)</p>
-            <div className="prefs-sliders">
-              {(Object.keys(dimensionLabels) as DimensionKey[]).map((key) => (
-                <div key={key} className="pref-slider-row">
-                  <div className="pref-slider-label">
-                    <strong>{dimensionLabels[key]}</strong>
-                    <span className="meta">{dimensionDescriptions[key]}</span>
-                  </div>
-                  <div className="pref-slider-control">
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      value={draft.weights[key]}
-                      onChange={(e) => setWeight(key, Number(e.target.value))}
-                    />
-                    <span className="pref-slider-value">{draft.weights[key]}</span>
-                  </div>
-                </div>
+            <h3>What matters most?</h3>
+            <p className="meta">Select one or more priorities</p>
+            <div className="priority-toggles">
+              {priorities.map((p) => (
+                <button
+                  key={p.key}
+                  type="button"
+                  className={`priority-toggle ${selectedPriorities.has(p.key) ? "active" : ""}`}
+                  onClick={() => togglePriority(p.key)}
+                >
+                  <strong>{p.label}</strong>
+                  <span>{p.description}</span>
+                </button>
               ))}
             </div>
           </section>
@@ -91,7 +131,7 @@ export default function PreferencesModal({ open, preferences, onSave, onClose }:
                 <button
                   key={field.key}
                   type="button"
-                  className={`interest-chip ${draft.interests.includes(field.key) ? "active" : ""}`}
+                  className={`interest-chip ${interests.includes(field.key) ? "active" : ""}`}
                   onClick={() => toggleInterest(field.key)}
                 >
                   {field.label}
@@ -107,23 +147,23 @@ export default function PreferencesModal({ open, preferences, onSave, onClose }:
               <input
                 type="text"
                 placeholder="e.g. Dallas, TX"
-                value={draft.homeLabel}
-                onChange={(e) => setDraft((prev) => ({ ...prev, homeLabel: e.target.value }))}
+                value={homeLabel}
+                onChange={(e) => setHomeLabel(e.target.value)}
               />
               <div className="prefs-coords">
                 <input
                   type="number"
                   placeholder="Latitude"
                   step="0.01"
-                  value={draft.homeLatitude ?? ""}
-                  onChange={(e) => setDraft((prev) => ({ ...prev, homeLatitude: e.target.value ? Number(e.target.value) : null }))}
+                  value={homeLatitude ?? ""}
+                  onChange={(e) => setHomeLatitude(e.target.value ? Number(e.target.value) : null)}
                 />
                 <input
                   type="number"
                   placeholder="Longitude"
                   step="0.01"
-                  value={draft.homeLongitude ?? ""}
-                  onChange={(e) => setDraft((prev) => ({ ...prev, homeLongitude: e.target.value ? Number(e.target.value) : null }))}
+                  value={homeLongitude ?? ""}
+                  onChange={(e) => setHomeLongitude(e.target.value ? Number(e.target.value) : null)}
                 />
               </div>
             </div>

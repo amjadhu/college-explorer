@@ -1,5 +1,6 @@
 import { readRankingData, scoreName, writeScorecardData } from "./lib";
 import { programFields } from "./majors";
+import type { ProgramData } from "./majors";
 
 type ScorecardSchool = {
   id: number;
@@ -42,7 +43,16 @@ type ScorecardSchool = {
   "latest.student.student_faculty_ratio": number | null;
   "latest.repayment.3_yr_default_rate": number | null;
   "latest.campus_safety.crime.criminal_offense.total": number | null;
+  "latest.programs.cip_4_digit"?: ProgramEntry[];
   [key: string]: unknown;
+};
+
+type ProgramEntry = {
+  code: string;
+  title: string;
+  credential: { level: number };
+  earnings?: { median_earnings_ceeb?: { median_earnings?: number | null } };
+  debt?: { median_debt?: { all_students?: number | null } };
 };
 
 const endpoint = "https://api.data.gov/ed/collegescorecard/v1/schools";
@@ -86,10 +96,27 @@ const baseFields = [
   "latest.earnings.10_yrs_after_entry.median",
   "latest.student.student_faculty_ratio",
   "latest.repayment.3_yr_default_rate",
-  "latest.campus_safety.crime.criminal_offense.total"
+  "latest.campus_safety.crime.criminal_offense.total",
+  "latest.programs.cip_4_digit",
 ];
 
 const fields = [...baseFields, ...programFields.map((field) => field.field)].join(",");
+
+export function extractProgramData(scorecard: ScorecardSchool | null): ProgramData[] {
+  if (!scorecard) return [];
+  const programs = scorecard["latest.programs.cip_4_digit"];
+  if (!Array.isArray(programs)) return [];
+
+  return programs
+    .map((p: ProgramEntry) => ({
+      cipCode: p.code ?? "",
+      title: p.title ?? "",
+      credentialLevel: p.credential?.level ?? 0,
+      medianEarnings: p.earnings?.median_earnings_ceeb?.median_earnings ?? null,
+      medianDebt: p.debt?.median_debt?.all_students ?? null,
+    }))
+    .filter((p) => p.cipCode.length >= 2);
+}
 
 async function fetchSchoolByName(apiKey: string, name: string): Promise<ScorecardSchool | null> {
   const params = new URLSearchParams();

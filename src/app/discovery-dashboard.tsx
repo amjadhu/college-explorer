@@ -4,19 +4,19 @@ import { useEffect, useMemo, useState } from "react";
 import CollegeMapPanel from "@/app/college-map-panel";
 import PreferencesModal from "@/app/preferences-modal";
 import MatchCard from "@/app/match-card";
-import InsightStrip from "@/app/insight-strip";
-import DimensionExplorer from "@/app/dimension-explorer";
 import { coverageCounts, filterColleges } from "@/lib/explorer";
 import { readPreferences, writePreferences, defaultPreferences } from "@/lib/preferences-storage";
 import { readShortlist, writeShortlist } from "@/lib/shortlist-storage";
 import { addToWorkspace, removeFromWorkspace } from "@/lib/workspace-storage";
 import { rankByFamilyScore } from "@/lib/scoring";
 import type { CollegeRecord, Filters, FamilyPreferences } from "@/lib/types";
+import type { CollegeBriefingData } from "@/app/actions/briefing";
 
 type Props = {
   colleges: CollegeRecord[];
   fetchedAt: string;
   rankingSource: { name: string; url: string; fallbackUsed?: boolean; fallbackFrom?: string };
+  briefings?: Record<string, CollegeBriefingData>;
 };
 
 const defaultFilters: Filters = {
@@ -34,7 +34,7 @@ const parseParam = (params: URLSearchParams, key: string, allowed: string[], fal
   return value && allowed.includes(value) ? value : fallback;
 };
 
-export default function DiscoveryDashboard({ colleges, fetchedAt, rankingSource }: Props) {
+export default function DiscoveryDashboard({ colleges, fetchedAt, rankingSource, briefings }: Props) {
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [shortlist, setShortlist] = useState<string[]>([]);
   const [preferences, setPreferences] = useState<FamilyPreferences>(defaultPreferences());
@@ -116,9 +116,9 @@ export default function DiscoveryDashboard({ colleges, fetchedAt, rankingSource 
     <>
       <section className="hero-v2">
         <p className="kicker">College Compass</p>
-        <h1>Your Family&apos;s College Intelligence</h1>
+        <h1>Find the Right School for Your Family</h1>
         <p>
-          Personalized insights for your college search — not just data, but what it means for your family.
+          AI-powered insights and program-level earnings data to help you make informed college decisions.
         </p>
 
         <div className="trust-row">
@@ -133,16 +133,9 @@ export default function DiscoveryDashboard({ colleges, fetchedAt, rankingSource 
 
       <div className="dashboard-actions">
         <button type="button" className="prefs-trigger" onClick={() => setPrefsOpen(true)}>
-          {hasCustomPrefs ? "Edit Preferences" : "Set What Matters to You"}
+          {hasCustomPrefs ? "Edit Priorities" : "Set Your Priorities"}
         </button>
-        {shortlist.length > 0 && (
-          <a href="/workspace" className="workspace-link">
-            Workspace ({shortlist.length})
-          </a>
-        )}
       </div>
-
-      {hasCustomPrefs && <InsightStrip ranked={ranked} interests={preferences.interests} />}
 
       <section className="controls-shell sticky-controls">
         <div className="filters">
@@ -206,8 +199,6 @@ export default function DiscoveryDashboard({ colleges, fetchedAt, rankingSource 
 
       {mapExpanded && <CollegeMapPanel colleges={filtered} shortlistSlugs={shortlist} />}
 
-      {hasCustomPrefs && <DimensionExplorer ranked={ranked} />}
-
       <section className="cards-header">
         <h2>{hasCustomPrefs ? "Your Top Matches" : "Explore Colleges"}</h2>
       </section>
@@ -220,6 +211,8 @@ export default function DiscoveryDashboard({ colleges, fetchedAt, rankingSource 
             familyScore={familyScore}
             onSave={toggleShortlist}
             isSaved={shortlist.includes(college.slug)}
+            briefing={briefings?.[college.slug] ?? null}
+            interests={preferences.interests}
           />
         ))}
       </section>

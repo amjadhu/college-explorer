@@ -1,4 +1,5 @@
 import { extractAllMajors, extractTopMajors } from "./majors";
+import { extractProgramData } from "./enrich-scorecard";
 import { carnegieLabel, religiousLabel } from "./lookup-tables";
 import { readScorecardData, writeFinalData } from "./lib";
 import { localeBucket, settingLabelFromBucket } from "../src/lib/format";
@@ -30,6 +31,10 @@ async function main() {
       const crimeTotalOnCampus = num(scorecard?.["latest.campus_safety.crime.criminal_offense.total"]);
       const carnegieCode = num(scorecard?.["school.carnegie_basic"]);
       const religiousCode = num(scorecard?.["school.religious_affiliation"]);
+
+      // Extract program-level earnings/debt data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const programData = extractProgramData(scorecard as any);
 
       return {
         rank: rankItem.rank,
@@ -92,9 +97,9 @@ async function main() {
         crimeTotalOnCampus,
         crimeRate: crimeRatePer1000(crimeTotalOnCampus, enrollment),
 
-        // Majors
-        topMajors: extractTopMajors(scorecard ?? null, 3),
-        allMajors: extractAllMajors(scorecard ?? null),
+        // Majors (now with program-level earnings/debt)
+        topMajors: extractTopMajors(scorecard ?? null, 3, programData),
+        allMajors: extractAllMajors(scorecard ?? null, programData),
 
         dataQuality: {
           hasAdmissions: admissionRate !== null,

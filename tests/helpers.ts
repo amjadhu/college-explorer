@@ -64,14 +64,14 @@ export function makeCollege(overrides: Partial<CollegeRecord> = {}): CollegeReco
 
     // Majors
     topMajors: [
-      { key: "engineering", label: "Engineering", share: 0.3 },
-      { key: "business", label: "Business & Marketing", share: 0.2 }
+      { key: "engineering", label: "Engineering", share: 0.3, medianEarnings: null, medianDebt: null },
+      { key: "business", label: "Business & Marketing", share: 0.2, medianEarnings: null, medianDebt: null }
     ],
     allMajors: [
-      { key: "engineering", label: "Engineering", share: 0.3 },
-      { key: "business", label: "Business & Marketing", share: 0.2 },
-      { key: "computer", label: "Computer Science", share: 0.15 },
-      { key: "biological", label: "Biological Sciences", share: 0.1 }
+      { key: "engineering", label: "Engineering", share: 0.3, medianEarnings: null, medianDebt: null },
+      { key: "business", label: "Business & Marketing", share: 0.2, medianEarnings: null, medianDebt: null },
+      { key: "computer", label: "Computer Science", share: 0.15, medianEarnings: null, medianDebt: null },
+      { key: "biological", label: "Biological Sciences", share: 0.1, medianEarnings: null, medianDebt: null }
     ],
     dataQuality: {
       hasAdmissions: true,

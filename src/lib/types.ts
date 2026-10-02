@@ -12,6 +12,8 @@ export type MajorShare = {
   key: string;
   label: string;
   share: number;
+  medianEarnings: number | null;
+  medianDebt: number | null;
 };
 
 export type DataQuality = {

@@ -3,22 +3,40 @@
 import Link from "next/link";
 import type { CollegeRecord } from "@/lib/types";
 import type { FamilyScore } from "@/lib/scoring";
-import { dimensionLabels } from "@/lib/scoring";
 import { formatMoney, formatPercent } from "@/lib/format";
+import type { CollegeBriefingData } from "@/app/actions/briefing";
 
 type Props = {
   college: CollegeRecord;
   familyScore: FamilyScore;
   onSave: (slug: string) => void;
   isSaved: boolean;
+  briefing?: CollegeBriefingData | null;
+  interests?: string[];
 };
 
-export default function MatchCard({ college, familyScore, onSave, isSaved }: Props) {
-  // Top 3 scoring dimensions
-  const topDimensions = [...familyScore.dimensions]
-    .filter((d) => d.available)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
+const verdictColors: Record<string, string> = {
+  strong_fit: "var(--ok)",
+  good_fit: "#2a8f7a",
+  decent_fit: "var(--brand)",
+  uncertain: "var(--muted)",
+  weak_fit: "var(--warn)",
+};
+
+const verdictLabels: Record<string, string> = {
+  strong_fit: "Strong Fit",
+  good_fit: "Good Fit",
+  decent_fit: "Decent Fit",
+  uncertain: "Uncertain",
+  weak_fit: "Weak Fit",
+};
+
+export default function MatchCard({ college, familyScore, onSave, isSaved, briefing, interests }: Props) {
+  // Find a program match if interests are set
+  const interestSet = new Set(interests ?? []);
+  const matchedProgram = college.allMajors.find(
+    (m) => interestSet.has(m.key) && m.medianEarnings != null
+  );
 
   return (
     <article className="match-card">
@@ -44,31 +62,46 @@ export default function MatchCard({ college, familyScore, onSave, isSaved }: Pro
         {college.ownership === 1 ? " · Public" : college.ownership != null ? " · Private" : ""}
       </p>
 
-      <div className="match-dimensions">
-        {topDimensions.map((dim) => (
-          <div key={dim.key} className="match-dim">
-            <div className="match-dim-bar">
-              <div className="match-dim-fill" style={{ width: `${dim.score}%` }} />
-            </div>
-            <span className="match-dim-label">{dimensionLabels[dim.key]}</span>
-            <span className="match-dim-score">{dim.score}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="match-stats">
-        <div className="match-stat">
-          <b>Acceptance</b>
-          <span>{formatPercent(college.admissionRate)}</span>
+      {briefing && (
+        <div className="match-verdict">
+          <span
+            className="verdict-badge-sm"
+            style={{ background: verdictColors[briefing.verdict] ?? "var(--muted)" }}
+          >
+            {verdictLabels[briefing.verdict] ?? briefing.verdict}
+          </span>
+          <span className="verdict-text">{briefing.oneLiner}</span>
         </div>
+      )}
+
+      <div className="match-key-numbers">
         <div className="match-stat">
-          <b>Net Price</b>
+          <b>Net Price/yr</b>
           <span>{formatMoney(college.avgNetPrice ?? college.costOfAttendance)}</span>
         </div>
         <div className="match-stat">
           <b>Earnings (10y)</b>
           <span>{formatMoney(college.medianEarnings10y)}</span>
         </div>
+        <div className="match-stat">
+          <b>Median Debt</b>
+          <span>{formatMoney(college.medianDebt)}</span>
+        </div>
+      </div>
+
+      {matchedProgram && (
+        <div className="match-program">
+          <span className="match-program-label">{matchedProgram.label}:</span>
+          <span className="match-program-earnings">
+            {formatMoney(matchedProgram.medianEarnings)} median earnings
+          </span>
+        </div>
+      )}
+
+      <div className="match-card-actions">
+        <Link href={`/colleges/${college.slug}`} className="ghost">
+          View Details
+        </Link>
       </div>
     </article>
   );
