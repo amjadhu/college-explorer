@@ -9,6 +9,8 @@ const baseFilters: Filters = {
   state: "all",
   ownership: "all",
   locale: "all",
+  satRange: "all",
+  sizeRange: "all",
   view: "cards"
 };
 
@@ -23,4 +25,30 @@ test("filterColleges filters by query, state, ownership, and setting", () => {
   assert.equal(filterColleges(colleges, { ...baseFilters, state: "MA" }).length, 1);
   assert.equal(filterColleges(colleges, { ...baseFilters, ownership: "public" }).length, 1);
   assert.equal(filterColleges(colleges, { ...baseFilters, locale: "rural" }).length, 1);
+});
+
+test("filterColleges filters by SAT range", () => {
+  const colleges = [
+    makeCollege({ slug: "a", satAvgScore: 1500 }),
+    makeCollege({ slug: "b", satAvgScore: 1300 }),
+    makeCollege({ slug: "c", satAvgScore: 1100 }),
+    makeCollege({ slug: "d", satAvgScore: 950 }),
+  ];
+
+  assert.equal(filterColleges(colleges, { ...baseFilters, satRange: "1400+" }).length, 1);
+  assert.equal(filterColleges(colleges, { ...baseFilters, satRange: "1200-1399" }).length, 1);
+  assert.equal(filterColleges(colleges, { ...baseFilters, satRange: "1000-1199" }).length, 1);
+  assert.equal(filterColleges(colleges, { ...baseFilters, satRange: "below-1000" }).length, 1);
+});
+
+test("filterColleges filters by size range", () => {
+  const colleges = [
+    makeCollege({ slug: "small", enrollment: 2000 }),
+    makeCollege({ slug: "medium", enrollment: 8000 }),
+    makeCollege({ slug: "large", enrollment: 30000 }),
+  ];
+
+  assert.equal(filterColleges(colleges, { ...baseFilters, sizeRange: "small" }).length, 1);
+  assert.equal(filterColleges(colleges, { ...baseFilters, sizeRange: "medium" }).length, 1);
+  assert.equal(filterColleges(colleges, { ...baseFilters, sizeRange: "large" }).length, 1);
 });

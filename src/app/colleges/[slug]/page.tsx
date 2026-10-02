@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ShortlistButton from "@/app/shortlist-button";
+import SchoolBriefing from "@/app/school-briefing";
 import { getCollegeBySlug, readColleges } from "@/lib/data";
-import { formatMajorShare, formatMoney, formatPercent, ownershipLabel } from "@/lib/format";
+import { formatMajorShare, formatMoney, formatPercent, ownershipLabel, formatSATRange, formatRatio } from "@/lib/format";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -18,6 +19,7 @@ export async function generateStaticParams() {
 export default async function CollegePage({ params }: Props) {
   const { slug } = await params;
   const college = await getCollegeBySlug(slug);
+  const allColleges = await readColleges();
 
   if (!college) return notFound();
 
@@ -30,7 +32,7 @@ export default async function CollegePage({ params }: Props) {
   return (
     <main>
       <Link href="/" className="meta" style={{ display: "inline-block", marginBottom: "0.8rem" }}>
-        ← Back to explore
+        &larr; Back to explore
       </Link>
 
       <section className="hero-v2 detail-hero">
@@ -41,29 +43,64 @@ export default async function CollegePage({ params }: Props) {
 
         <h1>{college.displayName}</h1>
         <p>
-          {college.city && college.state ? `${college.city}, ${college.state}` : "Location not available"} · {ownershipLabel(college.ownership)} · {college.settingLabel}
+          {college.city && college.state ? `${college.city}, ${college.state}` : "Location not available"} &middot; {ownershipLabel(college.ownership)} &middot; {college.settingLabel}
+          {college.carnegieLabel !== "Not classified" && ` · ${college.carnegieLabel}`}
+          {college.religiousLabel !== "Not affiliated" && ` · ${college.religiousLabel}`}
         </p>
 
         <div className="trust-row">
           <span>Source: <a href={college.rankingSource.url}>{college.rankingSource.name}</a></span>
           <span>Updated: {new Date(college.rankingSource.fetchedAt).toLocaleDateString()}</span>
-          <span>Admissions: {college.dataQuality.hasAdmissions ? "Available" : "N/A"}</span>
-          <span>Cost: {college.dataQuality.hasCost ? "Available" : "N/A"}</span>
-          <span>Earnings: {college.dataQuality.hasEarnings ? "Available" : "N/A"}</span>
+          {college.enrollment && <span>Enrollment: {college.enrollment.toLocaleString()}</span>}
+          {college.studentFacultyRatio && <span>Student-Faculty: {formatRatio(college.studentFacultyRatio)}</span>}
         </div>
       </section>
 
+      {/* Narrative briefing (client component) */}
+      <SchoolBriefing college={college} allColleges={allColleges} />
+
+      {/* Traditional stats sections */}
       <section className="detail">
-        <h2>Admissions & Cost</h2>
+        <h2>Admissions & Test Scores</h2>
         <div className="detail-grid">
           <div className="stat">
             <b>Acceptance rate</b>
             <span>{formatPercent(college.admissionRate)}</span>
           </div>
           <div className="stat">
+            <b>Average SAT</b>
+            <span>{college.satAvgScore?.toLocaleString() ?? "N/A"}</span>
+          </div>
+          <div className="stat">
+            <b>SAT Math (25th-75th)</b>
+            <span>{formatSATRange(college.satMath25, college.satMath75)}</span>
+          </div>
+          <div className="stat">
+            <b>SAT Reading (25th-75th)</b>
+            <span>{formatSATRange(college.satReading25, college.satReading75)}</span>
+          </div>
+          <div className="stat">
+            <b>ACT Midpoint</b>
+            <span>{college.actCumulativeMidpoint ?? "N/A"}</span>
+          </div>
+          <div className="stat">
             <b>Graduation rate</b>
             <span>{formatPercent(college.graduationRate)}</span>
           </div>
+          <div className="stat">
+            <b>Freshman retention</b>
+            <span>{formatPercent(college.retentionRate)}</span>
+          </div>
+          <div className="stat">
+            <b>Student-faculty ratio</b>
+            <span>{formatRatio(college.studentFacultyRatio)}</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="detail">
+        <h2>Cost & Financial Aid</h2>
+        <div className="detail-grid">
           <div className="stat">
             <b>In-state tuition</b>
             <span>{formatMoney(college.tuitionInState)}</span>
@@ -77,28 +114,42 @@ export default async function CollegePage({ params }: Props) {
             <span>{formatMoney(college.costOfAttendance)}</span>
           </div>
           <div className="stat">
-            <b>Enrollment</b>
-            <span>{college.enrollment?.toLocaleString() ?? "N/A"}</span>
+            <b>Average net price</b>
+            <span>{formatMoney(college.avgNetPrice)}</span>
+          </div>
+          <div className="stat">
+            <b>Pell Grant recipients</b>
+            <span>{formatPercent(college.percentReceivingAid)}</span>
+          </div>
+          <div className="stat">
+            <b>Median debt at graduation</b>
+            <span>{formatMoney(college.medianDebt)}</span>
+          </div>
+          <div className="stat">
+            <b>Federal loan rate</b>
+            <span>{formatPercent(college.federalLoanRate)}</span>
+          </div>
+          <div className="stat">
+            <b>Loan default rate (3yr)</b>
+            <span>{formatPercent(college.federalLoanDefaultRate)}</span>
           </div>
         </div>
       </section>
 
       <section className="detail">
-        <h2>Outcomes & Setting</h2>
+        <h2>Outcomes & Earnings</h2>
         <div className="detail-grid">
           <div className="stat">
             <b>Median earnings (10 years)</b>
             <span>{formatMoney(college.medianEarnings10y)}</span>
           </div>
           <div className="stat">
-            <b>Campus setting</b>
-            <span>{college.settingLabel}</span>
+            <b>Enrollment</b>
+            <span>{college.enrollment?.toLocaleString() ?? "N/A"}</span>
           </div>
           <div className="stat">
-            <b>Coordinates</b>
-            <span>
-              {college.latitude && college.longitude ? `${college.latitude.toFixed(4)}, ${college.longitude.toFixed(4)}` : "N/A"}
-            </span>
+            <b>Campus setting</b>
+            <span>{college.settingLabel}</span>
           </div>
           <div className="stat">
             <b>Official site</b>
@@ -107,11 +158,27 @@ export default async function CollegePage({ params }: Props) {
         </div>
       </section>
 
+      {college.crimeRate != null && (
+        <section className="detail">
+          <h2>Campus Safety</h2>
+          <div className="detail-grid">
+            <div className="stat">
+              <b>Total on-campus crimes</b>
+              <span>{college.crimeTotalOnCampus?.toLocaleString() ?? "N/A"}</span>
+            </div>
+            <div className="stat">
+              <b>Crime rate per 1,000 students</b>
+              <span>{college.crimeRate.toFixed(1)}</span>
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="detail">
-        <h2>Academic Strengths</h2>
-        {college.topMajors.length > 0 ? (
+        <h2>Academic Programs</h2>
+        {college.allMajors.length > 0 ? (
           <div className="major-grid">
-            {college.topMajors.map((major) => (
+            {college.allMajors.map((major) => (
               <div className="stat" key={major.key}>
                 <b>{major.label}</b>
                 <span>{formatMajorShare(major.share)}</span>
@@ -119,9 +186,41 @@ export default async function CollegePage({ params }: Props) {
             ))}
           </div>
         ) : (
-          <p className="meta">Major distribution is not available for this school.</p>
+          <p className="meta">Program distribution is not available for this school.</p>
         )}
       </section>
+
+      {(college.percentWhite != null || college.percentBlack != null) && (
+        <section className="detail">
+          <h2>Student Demographics</h2>
+          <div className="detail-grid">
+            <div className="stat">
+              <b>Female</b>
+              <span>{formatPercent(college.percentFemale)}</span>
+            </div>
+            <div className="stat">
+              <b>Part-time</b>
+              <span>{formatPercent(college.percentPartTime)}</span>
+            </div>
+            <div className="stat">
+              <b>White</b>
+              <span>{formatPercent(college.percentWhite)}</span>
+            </div>
+            <div className="stat">
+              <b>Black</b>
+              <span>{formatPercent(college.percentBlack)}</span>
+            </div>
+            <div className="stat">
+              <b>Hispanic</b>
+              <span>{formatPercent(college.percentHispanic)}</span>
+            </div>
+            <div className="stat">
+              <b>Asian</b>
+              <span>{formatPercent(college.percentAsian)}</span>
+            </div>
+          </div>
+        </section>
+      )}
     </main>
   );
 }

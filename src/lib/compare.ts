@@ -1,4 +1,7 @@
 import type { CollegeRecord } from "@/lib/types";
+import type { FamilyScore } from "@/lib/scoring";
+import { dimensionLabels } from "@/lib/scoring";
+import type { DimensionKey } from "@/lib/types";
 
 export type CompareMetric = {
   key: string;
@@ -24,6 +27,13 @@ export const compareMetrics: CompareMetric[] = [
     direction: "lower"
   },
   {
+    key: "avgNetPrice",
+    label: "Average net price",
+    kind: "money",
+    accessor: (college) => college.avgNetPrice,
+    direction: "lower"
+  },
+  {
     key: "medianEarnings10y",
     label: "Median earnings (10y)",
     kind: "money",
@@ -36,6 +46,34 @@ export const compareMetrics: CompareMetric[] = [
     kind: "percent",
     accessor: (college) => college.graduationRate,
     direction: "higher"
+  },
+  {
+    key: "retentionRate",
+    label: "Freshman retention",
+    kind: "percent",
+    accessor: (college) => college.retentionRate,
+    direction: "higher"
+  },
+  {
+    key: "satAvgScore",
+    label: "Average SAT",
+    kind: "count",
+    accessor: (college) => college.satAvgScore,
+    direction: "higher"
+  },
+  {
+    key: "studentFacultyRatio",
+    label: "Student-faculty ratio",
+    kind: "count",
+    accessor: (college) => college.studentFacultyRatio,
+    direction: "lower"
+  },
+  {
+    key: "medianDebt",
+    label: "Median debt",
+    kind: "money",
+    accessor: (college) => college.medianDebt,
+    direction: "lower"
   },
   {
     key: "enrollment",
@@ -69,4 +107,36 @@ export function compareHighlights(colleges: CollegeRecord[], metric: CompareMetr
     best: new Set(rows.filter((row) => row.value === bestValue).map((row) => row.slug)),
     caution: new Set(rows.filter((row) => row.value === cautionValue).map((row) => row.slug))
   };
+}
+
+/** Generate dimension trade-off text for two colleges. */
+export function generateTradeoffs(
+  collegeA: CollegeRecord,
+  collegeB: CollegeRecord,
+  scoreA: FamilyScore,
+  scoreB: FamilyScore
+): Array<{ dimension: string; text: string }> {
+  const results: Array<{ dimension: string; text: string }> = [];
+
+  for (const key of Object.keys(dimensionLabels) as DimensionKey[]) {
+    const dimA = scoreA.dimensions.find((d) => d.key === key);
+    const dimB = scoreB.dimensions.find((d) => d.key === key);
+    if (!dimA || !dimB) continue;
+
+    const diff = dimA.score - dimB.score;
+    const label = dimensionLabels[key];
+
+    let text: string;
+    if (Math.abs(diff) < 5) {
+      text = `${collegeA.displayName} and ${collegeB.displayName} are similar on ${label}.`;
+    } else if (diff > 0) {
+      text = `${collegeA.displayName} is stronger for ${label} (${dimA.score} vs ${dimB.score}), but ${collegeB.displayName} may have other advantages.`;
+    } else {
+      text = `${collegeB.displayName} is stronger for ${label} (${dimB.score} vs ${dimA.score}), but ${collegeA.displayName} may have other advantages.`;
+    }
+
+    results.push({ dimension: label, text });
+  }
+
+  return results;
 }

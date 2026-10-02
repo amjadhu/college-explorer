@@ -9,15 +9,39 @@ type ScorecardSchool = {
   "school.school_url": string | null;
   "school.locale": string | null;
   "school.ownership": number | null;
+  "school.carnegie_basic": number | null;
+  "school.religious_affiliation": number | null;
   "location.lat": number | null;
   "location.lon": number | null;
   "latest.student.size": number | null;
+  "latest.student.demographics.female_share": number | null;
+  "latest.student.demographics.race_ethnicity.white": number | null;
+  "latest.student.demographics.race_ethnicity.black": number | null;
+  "latest.student.demographics.race_ethnicity.hispanic": number | null;
+  "latest.student.demographics.race_ethnicity.asian": number | null;
+  "latest.student.part_time_share": number | null;
+  "latest.student.retention_rate.four_year.full_time": number | null;
   "latest.admissions.admission_rate.overall": number | null;
+  "latest.admissions.sat_scores.average.overall": number | null;
+  "latest.admissions.sat_scores.25th_percentile.critical_reading": number | null;
+  "latest.admissions.sat_scores.75th_percentile.critical_reading": number | null;
+  "latest.admissions.sat_scores.25th_percentile.math": number | null;
+  "latest.admissions.sat_scores.75th_percentile.math": number | null;
+  "latest.admissions.act_scores.midpoint.cumulative": number | null;
   "latest.cost.tuition.in_state": number | null;
   "latest.cost.tuition.out_of_state": number | null;
   "latest.cost.attendance.academic_year": number | null;
+  "latest.cost.avg_net_price.overall": number | null;
+  "latest.aid.pell_grant_rate": number | null;
+  "latest.aid.federal_loan_rate": number | null;
+  "latest.aid.median_debt.completers.overall": number | null;
+  "latest.aid.loan_principal": number | null;
   "latest.completion.rate_suppressed.overall": number | null;
   "latest.earnings.10_yrs_after_entry.median": number | null;
+  "latest.student.FAFSA_applications": number | null;
+  "latest.student.student_faculty_ratio": number | null;
+  "latest.repayment.3_yr_default_rate": number | null;
+  "latest.campus_safety.crime.criminal_offense.total": number | null;
   [key: string]: unknown;
 };
 
@@ -31,15 +55,38 @@ const baseFields = [
   "school.school_url",
   "school.locale",
   "school.ownership",
+  "school.carnegie_basic",
+  "school.religious_affiliation",
   "location.lat",
   "location.lon",
   "latest.student.size",
+  "latest.student.demographics.female_share",
+  "latest.student.demographics.race_ethnicity.white",
+  "latest.student.demographics.race_ethnicity.black",
+  "latest.student.demographics.race_ethnicity.hispanic",
+  "latest.student.demographics.race_ethnicity.asian",
+  "latest.student.part_time_share",
+  "latest.student.retention_rate.four_year.full_time",
   "latest.admissions.admission_rate.overall",
+  "latest.admissions.sat_scores.average.overall",
+  "latest.admissions.sat_scores.25th_percentile.critical_reading",
+  "latest.admissions.sat_scores.75th_percentile.critical_reading",
+  "latest.admissions.sat_scores.25th_percentile.math",
+  "latest.admissions.sat_scores.75th_percentile.math",
+  "latest.admissions.act_scores.midpoint.cumulative",
   "latest.cost.tuition.in_state",
   "latest.cost.tuition.out_of_state",
   "latest.cost.attendance.academic_year",
+  "latest.cost.avg_net_price.overall",
+  "latest.aid.pell_grant_rate",
+  "latest.aid.federal_loan_rate",
+  "latest.aid.median_debt.completers.overall",
+  "latest.aid.loan_principal",
   "latest.completion.rate_suppressed.overall",
-  "latest.earnings.10_yrs_after_entry.median"
+  "latest.earnings.10_yrs_after_entry.median",
+  "latest.student.student_faculty_ratio",
+  "latest.repayment.3_yr_default_rate",
+  "latest.campus_safety.crime.criminal_offense.total"
 ];
 
 const fields = [...baseFields, ...programFields.map((field) => field.field)].join(",");

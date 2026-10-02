@@ -24,9 +24,54 @@ export function makeCollege(overrides: Partial<CollegeRecord> = {}): CollegeReco
     latitude: 42.36,
     longitude: -71.05,
     scorecardId: 1,
+
+    // SAT/ACT
+    satAvgScore: 1400,
+    actCumulativeMidpoint: 32,
+    satMath25: 680,
+    satMath75: 780,
+    satReading25: 670,
+    satReading75: 760,
+
+    // Retention & student life
+    retentionRate: 0.96,
+    studentFacultyRatio: 6,
+    percentFemale: 0.48,
+    percentPartTime: 0.03,
+
+    // Demographics
+    percentWhite: 0.4,
+    percentBlack: 0.08,
+    percentHispanic: 0.12,
+    percentAsian: 0.22,
+
+    // Financial aid
+    percentReceivingAid: 0.55,
+    avgNetPrice: 18000,
+    medianDebt: 12000,
+    federalLoanRate: 0.15,
+    federalLoanDefaultRate: 0.01,
+
+    // Classification
+    carnegieClassification: 15,
+    carnegieLabel: "Doctoral University — Very High Research",
+    religiousAffiliation: null,
+    religiousLabel: "Not affiliated",
+
+    // Safety
+    crimeTotalOnCampus: 25,
+    crimeRate: 5.0,
+
+    // Majors
     topMajors: [
       { key: "engineering", label: "Engineering", share: 0.3 },
       { key: "business", label: "Business & Marketing", share: 0.2 }
+    ],
+    allMajors: [
+      { key: "engineering", label: "Engineering", share: 0.3 },
+      { key: "business", label: "Business & Marketing", share: 0.2 },
+      { key: "computer", label: "Computer Science", share: 0.15 },
+      { key: "biological", label: "Biological Sciences", share: 0.1 }
     ],
     dataQuality: {
       hasAdmissions: true,

@@ -53,3 +53,41 @@ const settingLabels: Record<SettingBucket, string> = {
 export const localeLabel = (locale: unknown): string => settingLabels[localeBucket(locale)];
 
 export const settingLabelFromBucket = (bucket: SettingBucket): string => settingLabels[bucket];
+
+// ---- New formatters ----
+
+export const formatSAT = (value: number | null): string => {
+  if (value == null) return "N/A";
+  return value.toLocaleString();
+};
+
+export const formatACT = (value: number | null): string => {
+  if (value == null) return "N/A";
+  return value.toString();
+};
+
+export const formatRatio = (value: number | null): string => {
+  if (value == null) return "N/A";
+  return `${value}:1`;
+};
+
+export const formatNumber = (value: number | null): string => {
+  if (value == null) return "N/A";
+  return value.toLocaleString();
+};
+
+export const formatDemographic = (value: number | null): string => {
+  if (value == null) return "N/A";
+  return `${(value * 100).toFixed(0)}%`;
+};
+
+export const formatSATRange = (p25: number | null, p75: number | null): string => {
+  if (p25 == null || p75 == null) return "N/A";
+  return `${p25}–${p75}`;
+};
+
+export const formatDistance = (miles: number): string => {
+  if (miles < 1) return "< 1 mile";
+  if (miles < 100) return `${Math.round(miles)} mi`;
+  return `${Math.round(miles).toLocaleString()} mi`;
+};

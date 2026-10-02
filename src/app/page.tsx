@@ -1,4 +1,4 @@
-import CollegeExplorer from "@/app/college-explorer";
+import DiscoveryDashboard from "@/app/discovery-dashboard";
 import { readColleges } from "@/lib/data";
 
 export default async function HomePage() {
@@ -19,7 +19,7 @@ export default async function HomePage() {
 
   return (
     <main>
-      <CollegeExplorer colleges={colleges} fetchedAt={rankingSource.fetchedAt} rankingSource={rankingSource} />
+      <DiscoveryDashboard colleges={colleges} fetchedAt={rankingSource.fetchedAt} rankingSource={rankingSource} />
     </main>
   );
 }
