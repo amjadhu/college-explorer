@@ -123,7 +123,7 @@ async function main() {
     colleges
   });
 
-  console.log(`Wrote data/top50-colleges.json with ${colleges.length} colleges.`);
+  console.log(`Wrote data/top75-colleges.json with ${colleges.length} colleges.`);
 }
 
 main().catch((error) => {

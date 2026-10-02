@@ -7,9 +7,9 @@ export type RankItem = {
   slug: string;
 };
 
-const RANKING_OUTPUT = path.join(process.cwd(), "data", "raw", "ranking-top50.json");
+const RANKING_OUTPUT = path.join(process.cwd(), "data", "raw", "ranking-top75.json");
 const SCORECARD_OUTPUT = path.join(process.cwd(), "data", "raw", "scorecard-enriched.json");
-const FINAL_OUTPUT = path.join(process.cwd(), "data", "top50-colleges.json");
+const FINAL_OUTPUT = path.join(process.cwd(), "data", "top75-colleges.json");
 
 export async function writeRankingData(data: object) {
   await fs.mkdir(path.dirname(RANKING_OUTPUT), { recursive: true });

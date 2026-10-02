@@ -1,0 +1,385 @@
+{
+  "source": {
+    "name": "U.S. News Best Colleges",
+    "url": "https://www.usnews.com/best-colleges/rankings/national-universities",
+    "fetchedAt": "2026-10-02T16:23:12.339Z",
+    "fallbackUsed": false
+  },
+  "colleges": [
+    {
+      "rank": 1,
+      "name": "Massachusetts Institute of Technology",
+      "slug": "massachusetts-institute-of-technology"
+    },
+    {
+      "rank": 2,
+      "name": "Princeton University",
+      "slug": "princeton-university"
+    },
+    {
+      "rank": 3,
+      "name": "Harvard University",
+      "slug": "harvard-university"
+    },
+    {
+      "rank": 4,
+      "name": "Yale University",
+      "slug": "yale-university"
+    },
+    {
+      "rank": 5,
+      "name": "California Institute of Technology",
+      "slug": "california-institute-of-technology"
+    },
+    {
+      "rank": 6,
+      "name": "Stanford University",
+      "slug": "stanford-university"
+    },
+    {
+      "rank": 7,
+      "name": "University of Pennsylvania",
+      "slug": "university-of-pennsylvania"
+    },
+    {
+      "rank": 8,
+      "name": "Duke University",
+      "slug": "duke-university"
+    },
+    {
+      "rank": 9,
+      "name": "Johns Hopkins University",
+      "slug": "johns-hopkins-university"
+    },
+    {
+      "rank": 10,
+      "name": "Northwestern University",
+      "slug": "northwestern-university"
+    },
+    {
+      "rank": 11,
+      "name": "University of Chicago",
+      "slug": "university-of-chicago"
+    },
+    {
+      "rank": 12,
+      "name": "Columbia University",
+      "slug": "columbia-university"
+    },
+    {
+      "rank": 13,
+      "name": "Dartmouth College",
+      "slug": "dartmouth-college"
+    },
+    {
+      "rank": 14,
+      "name": "Carnegie Mellon University",
+      "slug": "carnegie-mellon-university"
+    },
+    {
+      "rank": 15,
+      "name": "Cornell University",
+      "slug": "cornell-university"
+    },
+    {
+      "rank": 16,
+      "name": "Brown University",
+      "slug": "brown-university"
+    },
+    {
+      "rank": 17,
+      "name": "Rice University",
+      "slug": "rice-university"
+    },
+    {
+      "rank": 18,
+      "name": "Vanderbilt University",
+      "slug": "vanderbilt-university"
+    },
+    {
+      "rank": 19,
+      "name": "Washington University in St. Louis",
+      "slug": "washington-university-in-st-louis"
+    },
+    {
+      "rank": 20,
+      "name": "University of California, Berkeley",
+      "slug": "university-of-california-berkeley"
+    },
+    {
+      "rank": 21,
+      "name": "University of California, Los Angeles",
+      "slug": "university-of-california-los-angeles"
+    },
+    {
+      "rank": 22,
+      "name": "University of Notre Dame",
+      "slug": "university-of-notre-dame"
+    },
+    {
+      "rank": 23,
+      "name": "Emory University",
+      "slug": "emory-university"
+    },
+    {
+      "rank": 24,
+      "name": "Georgetown University",
+      "slug": "georgetown-university"
+    },
+    {
+      "rank": 25,
+      "name": "University of Michigan--Ann Arbor",
+      "slug": "university-of-michigan-ann-arbor"
+    },
+    {
+      "rank": 26,
+      "name": "University of Virginia",
+      "slug": "university-of-virginia"
+    },
+    {
+      "rank": 27,
+      "name": "University of North Carolina--Chapel Hill",
+      "slug": "university-of-north-carolina-chapel-hill"
+    },
+    {
+      "rank": 28,
+      "name": "University of Southern California",
+      "slug": "university-of-southern-california"
+    },
+    {
+      "rank": 29,
+      "name": "Georgia Institute of Technology",
+      "slug": "georgia-institute-of-technology"
+    },
+    {
+      "rank": 30,
+      "name": "University of California San Diego",
+      "slug": "university-of-california-san-diego"
+    },
+    {
+      "rank": 31,
+      "name": "Boston College",
+      "slug": "boston-college"
+    },
+    {
+      "rank": 32,
+      "name": "New York University",
+      "slug": "new-york-university"
+    },
+    {
+      "rank": 33,
+      "name": "Tufts University",
+      "slug": "tufts-university"
+    },
+    {
+      "rank": 34,
+      "name": "Boston University",
+      "slug": "boston-university"
+    },
+    {
+      "rank": 35,
+      "name": "The University of Texas--Austin",
+      "slug": "the-university-of-texas-austin"
+    },
+    {
+      "rank": 36,
+      "name": "University of California, Davis",
+      "slug": "university-of-california-davis"
+    },
+    {
+      "rank": 37,
+      "name": "University of California, Irvine",
+      "slug": "university-of-california-irvine"
+    },
+    {
+      "rank": 38,
+      "name": "University of Florida",
+      "slug": "university-of-florida"
+    },
+    {
+      "rank": 39,
+      "name": "University of Illinois Urbana-Champaign",
+      "slug": "university-of-illinois-urbana-champaign"
+    },
+    {
+      "rank": 40,
+      "name": "University of Wisconsin--Madison",
+      "slug": "university-of-wisconsin-madison"
+    },
+    {
+      "rank": 41,
+      "name": "Wake Forest University",
+      "slug": "wake-forest-university"
+    },
+    {
+      "rank": 42,
+      "name": "Northeastern University",
+      "slug": "northeastern-university"
+    },
+    {
+      "rank": 43,
+      "name": "Villanova University",
+      "slug": "villanova-university"
+    },
+    {
+      "rank": 44,
+      "name": "Case Western Reserve University",
+      "slug": "case-western-reserve-university"
+    },
+    {
+      "rank": 45,
+      "name": "Lehigh University",
+      "slug": "lehigh-university"
+    },
+    {
+      "rank": 46,
+      "name": "Rutgers University--New Brunswick",
+      "slug": "rutgers-university-new-brunswick"
+    },
+    {
+      "rank": 47,
+      "name": "The Ohio State University",
+      "slug": "the-ohio-state-university"
+    },
+    {
+      "rank": 48,
+      "name": "University of California, Santa Barbara",
+      "slug": "university-of-california-santa-barbara"
+    },
+    {
+      "rank": 49,
+      "name": "University of Maryland, College Park",
+      "slug": "university-of-maryland-college-park"
+    },
+    {
+      "rank": 50,
+      "name": "University of Rochester",
+      "slug": "university-of-rochester"
+    },
+    {
+      "rank": 51,
+      "name": "University of Washington",
+      "slug": "university-of-washington"
+    },
+    {
+      "rank": 52,
+      "name": "University of Georgia",
+      "slug": "university-of-georgia"
+    },
+    {
+      "rank": 53,
+      "name": "Virginia Tech",
+      "slug": "virginia-tech"
+    },
+    {
+      "rank": 54,
+      "name": "William & Mary",
+      "slug": "william-and-mary"
+    },
+    {
+      "rank": 55,
+      "name": "Purdue University--Main Campus",
+      "slug": "purdue-university-main-campus"
+    },
+    {
+      "rank": 56,
+      "name": "Santa Clara University",
+      "slug": "santa-clara-university"
+    },
+    {
+      "rank": 57,
+      "name": "The Pennsylvania State University--University Park",
+      "slug": "the-pennsylvania-state-university-university-park"
+    },
+    {
+      "rank": 58,
+      "name": "University of Miami",
+      "slug": "university-of-miami"
+    },
+    {
+      "rank": 59,
+      "name": "Brandeis University",
+      "slug": "brandeis-university"
+    },
+    {
+      "rank": 60,
+      "name": "Florida State University",
+      "slug": "florida-state-university"
+    },
+    {
+      "rank": 61,
+      "name": "George Washington University",
+      "slug": "george-washington-university"
+    },
+    {
+      "rank": 62,
+      "name": "Stevens Institute of Technology",
+      "slug": "stevens-institute-of-technology"
+    },
+    {
+      "rank": 63,
+      "name": "Stony Brook University--SUNY",
+      "slug": "stony-brook-university-suny"
+    },
+    {
+      "rank": 64,
+      "name": "Texas A&M University",
+      "slug": "texas-a-and-m-university"
+    },
+    {
+      "rank": 65,
+      "name": "Tulane University of Louisiana",
+      "slug": "tulane-university-of-louisiana"
+    },
+    {
+      "rank": 66,
+      "name": "University of Massachusetts--Amherst",
+      "slug": "university-of-massachusetts-amherst"
+    },
+    {
+      "rank": 67,
+      "name": "University of Minnesota--Twin Cities",
+      "slug": "university-of-minnesota-twin-cities"
+    },
+    {
+      "rank": 68,
+      "name": "University of Pittsburgh",
+      "slug": "university-of-pittsburgh"
+    },
+    {
+      "rank": 69,
+      "name": "Michigan State University",
+      "slug": "michigan-state-university"
+    },
+    {
+      "rank": 70,
+      "name": "Rensselaer Polytechnic Institute",
+      "slug": "rensselaer-polytechnic-institute"
+    },
+    {
+      "rank": 71,
+      "name": "University of California, Merced",
+      "slug": "university-of-california-merced"
+    },
+    {
+      "rank": 72,
+      "name": "Syracuse University",
+      "slug": "syracuse-university"
+    },
+    {
+      "rank": 73,
+      "name": "Binghamton University--SUNY",
+      "slug": "binghamton-university-suny"
+    },
+    {
+      "rank": 74,
+      "name": "Howard University",
+      "slug": "howard-university"
+    },
+    {
+      "rank": 75,
+      "name": "Indiana University--Bloomington",
+      "slug": "indiana-university-bloomington"
+    }
+  ]
+}

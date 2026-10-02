@@ -80,7 +80,7 @@ async function fetchPage(url: string): Promise<UsNewsSearchResponse> {
   throw new Error(`US News search API failed after retries for ${url}.`);
 }
 
-export async function fetchUsNewsTop50() {
+export async function fetchUsNewsTop75() {
   const url = process.env.USNEWS_RANKING_URL || DEFAULT_USNEWS_URL;
   const schoolType = parseSchoolTypeFromUrl(url);
   let nextUrl = `${USNEWS_SEARCH_API}&${new URLSearchParams({
@@ -91,7 +91,7 @@ export async function fetchUsNewsTop50() {
   const all: Array<{ rank: number; name: string; slug: string }> = [];
   const seenNames = new Set<string>();
 
-  for (let iteration = 0; iteration < 12 && all.length < 50 && nextUrl; iteration += 1) {
+  for (let iteration = 0; iteration < 12 && all.length < 75 && nextUrl; iteration += 1) {
     const payload = await fetchPage(nextUrl);
     const items = payload.data?.items ?? [];
     nextUrl = payload.data?.next_link ?? "";
@@ -113,17 +113,17 @@ export async function fetchUsNewsTop50() {
       seenNames.add(key);
 
       all.push({ rank, name, slug: slugify(name) });
-      if (all.length >= 50) break;
+      if (all.length >= 75) break;
     }
   }
 
-  const top50 = all
+  const top75 = all
     .sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name))
-    .slice(0, 50)
+    .slice(0, 75)
     .map((item, index) => ({ ...item, rank: index + 1 }));
 
-  if (top50.length < 50) {
-    throw new Error(`US News API yielded only ${top50.length} ranked colleges. Expected 50.`);
+  if (top75.length < 75) {
+    throw new Error(`US News API yielded only ${top75.length} ranked colleges. Expected 75.`);
   }
 
   await writeRankingData({
@@ -133,16 +133,16 @@ export async function fetchUsNewsTop50() {
       fetchedAt: new Date().toISOString(),
       fallbackUsed: false
     },
-    colleges: top50
+    colleges: top75
   });
 
-  console.log(`Saved U.S. News top ${top50.length} colleges from ${url}.`);
+  console.log(`Saved U.S. News top ${top75.length} colleges from ${url}.`);
 }
 
 const isDirectRun = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (isDirectRun) {
-  fetchUsNewsTop50().catch((error) => {
+  fetchUsNewsTop75().catch((error) => {
     console.error(error);
     process.exit(1);
   });

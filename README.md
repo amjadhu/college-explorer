@@ -16,10 +16,10 @@ College Compass is a static Next.js app for students and parents to explore top 
 No seeded sample data. Dataset is built from live ranking + College Scorecard sources.
 
 - `scripts/fetch-rankings.ts`: ranking orchestrator
-- `scripts/fetch-usnews-top50.ts`: U.S. News source adapter
-- `scripts/fetch-forbes-top50.ts`: Forbes source adapter
+- `scripts/fetch-usnews-top75.ts`: U.S. News source adapter
+- `scripts/fetch-forbes-top75.ts`: Forbes source adapter
 - `scripts/enrich-scorecard.ts`: enriches ranked schools with College Scorecard fields
-- `scripts/build-dataset.ts`: writes final `data/top50-colleges.json`
+- `scripts/build-dataset.ts`: writes final `data/top75-colleges.json`
 
 Ranking behavior:
 

@@ -6,7 +6,7 @@ const FORBES_LIST_API = "https://www.forbes.com/lists-api/getListData";
 
 const encode = (value: string | number): string => Buffer.from(String(value), "utf-8").toString("base64");
 
-export async function fetchForbesTop50(options?: { fallbackFrom?: string }) {
+export async function fetchForbesTop75(options?: { fallbackFrom?: string }) {
   const url = process.env.FORBES_RANKING_URL || DEFAULT_FORBES_URL;
   const res = await fetch(url, {
     headers: {
@@ -58,7 +58,7 @@ export async function fetchForbesTop50(options?: { fallbackFrom?: string }) {
   const listApiUrl = `${FORBES_LIST_API}?${new URLSearchParams({
     listUri: encode(listUri),
     year: encode(year),
-    limit: encode(50),
+    limit: encode(75),
     sortBy: encode(sortBy),
     sortOrder: encode(sortOrder),
     search: encode(""),
@@ -83,7 +83,7 @@ export async function fetchForbesTop50(options?: { fallbackFrom?: string }) {
     data?: Array<{ rank?: string | number; organizationName?: string }>;
   };
 
-  const top50 = (payload.data ?? [])
+  const top75 = (payload.data ?? [])
     .map((item) => {
       const rank = Number(item.rank);
       const name = item.organizationName?.trim();
@@ -92,10 +92,10 @@ export async function fetchForbesTop50(options?: { fallbackFrom?: string }) {
     })
     .filter((item): item is { rank: number; name: string; slug: string } => Boolean(item))
     .sort((a, b) => a.rank - b.rank)
-    .slice(0, 50);
+    .slice(0, 75);
 
-  if (top50.length < 50) {
-    throw new Error(`Forbes list API returned only ${top50.length} colleges. Expected 50.`);
+  if (top75.length < 75) {
+    throw new Error(`Forbes list API returned only ${top75.length} colleges. Expected 75.`);
   }
 
   await writeRankingData({
@@ -106,16 +106,16 @@ export async function fetchForbesTop50(options?: { fallbackFrom?: string }) {
       fallbackUsed: Boolean(options?.fallbackFrom),
       fallbackFrom: options?.fallbackFrom
     },
-    colleges: top50
+    colleges: top75
   });
 
-  console.log(`Saved Forbes top ${top50.length} colleges from ${url}.`);
+  console.log(`Saved Forbes top ${top75.length} colleges from ${url}.`);
 }
 
 const isDirectRun = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (isDirectRun) {
-  fetchForbesTop50().catch((error) => {
+  fetchForbesTop75().catch((error) => {
     console.error(error);
     process.exit(1);
   });

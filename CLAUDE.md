@@ -6,12 +6,12 @@ An AI-powered college intelligence tool for families, built with Next.js 15 on V
 ## Architecture
 
 ### Data Pipeline (`scripts/`)
-- `fetch-rankings.ts` → `fetch-forbes-top50.ts` / `fetch-usnews-top50.ts` → `enrich-scorecard.ts` → `build-dataset.ts`
+- `fetch-rankings.ts` → `fetch-forbes-top75.ts` / `fetch-usnews-top75.ts` → `enrich-scorecard.ts` → `build-dataset.ts`
 - `enrich-scorecard.ts` — fetches school data + `latest.programs.cip_4_digit` for program-level earnings/debt
 - `majors.ts` — 27 program fields with CIP code prefixes, `extractTopMajors()` and `extractAllMajors()` now include `medianEarnings` and `medianDebt`
 - `lookup-tables.ts` — Carnegie/religious code-to-label maps
 - Pipeline run: `npm run data:refresh` (requires `COLLEGE_SCORECARD_API_KEY`)
-- Output: `data/top50-colleges.json`
+- Output: `data/top75-colleges.json`
 
 ### Database (Turso + Drizzle)
 - `src/lib/db/schema.ts` — `college_briefings` table (id, slug, briefing_data JSON, model, generated_at)
@@ -93,5 +93,5 @@ An AI-powered college intelligence tool for families, built with Next.js 15 on V
 - Server actions enabled for AI briefing generation
 - Environment variables configured in Vercel dashboard
 - Turso DB: `college-compass` (libsql://college-compass-famshuss.aws-us-west-2.turso.io)
-- Data file (`data/top50-colleges.json`) is committed to repo — Vercel builds don't run the data pipeline
+- Data file (`data/top75-colleges.json`) is committed to repo — Vercel builds don't run the data pipeline
 - `drizzle.config.ts` uses dialect `"turso"` with `authToken` in dbCredentials

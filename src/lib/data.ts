@@ -3,7 +3,7 @@ import path from "node:path";
 import { cache } from "react";
 import type { CollegeRecord } from "@/lib/types";
 
-const DATA_PATH = path.join(process.cwd(), "data", "top50-colleges.json");
+const DATA_PATH = path.join(process.cwd(), "data", "top75-colleges.json");
 
 export const readColleges = cache(async (): Promise<CollegeRecord[]> => {
   try {
